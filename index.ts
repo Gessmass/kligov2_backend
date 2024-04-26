@@ -3,6 +3,7 @@ import dataSource from "./config/db";
 import {buildSchema} from 'type-graphql';
 import {ApolloServer} from "@apollo/server";
 import {startStandaloneServer} from "@apollo/server/standalone";
+import {OrganizationResolver} from "./resolvers/OrganizationResolver";
 
 dotenv.config({path: `${__dirname}/.env`});
 
@@ -12,7 +13,7 @@ const start = async () => {
 		console.log("Datasource has been initialized");
 
 		const schema = await buildSchema({
-			resolvers: []  // Make sure to include actual resolver classes
+			resolvers: [OrganizationResolver]  // Make sure to include actual resolver classes
 		});
 
 		const server = new ApolloServer({schema});

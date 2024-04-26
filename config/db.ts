@@ -1,4 +1,5 @@
 import {DataSource} from 'typeorm'
+import {Organization} from "../entities/organization";
 
 const {DB_HOST, DB_USER, DB_NAME, DB_PORT, DB_PASSWORD} = process.env
 
@@ -11,7 +12,7 @@ export const dataSource = new DataSource({
 	database: DB_NAME,
 	synchronize: false,
 	logging: ["error", "query"],
-	entities: []
+	entities: [Organization]
 })
 
 export default dataSource

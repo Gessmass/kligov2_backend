@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/server": "^4.10.4",
     "@types/cors": "^2.8.17",
+    "@types/ip-address": "^7.0.0",
     "@types/node": "^20.12.7",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
@@ -19,6 +20,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "graphql": "^16.8.1",
+    "ip-address": "^9.0.5",
+    "pg": "^8.11.5",
     "reflect-metadata": "^0.2.2",
     "ts-node-dev": "^2.0.0",
     "type-graphql": "^2.0.0-rc.1",
