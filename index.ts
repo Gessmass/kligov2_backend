@@ -1,30 +1,19 @@
-import dotenv from 'dotenv';
 import dataSource from "./config/db";
-import {buildSchema} from 'type-graphql';
-import {ApolloServer} from "@apollo/server";
-import {startStandaloneServer} from "@apollo/server/standalone";
-import {OrganizationResolver} from "./resolvers/OrganizationResolver";
+import app from './app'
 
-dotenv.config({path: `${__dirname}/.env`});
+const port = 4242;
 
 const start = async () => {
 	try {
 		await dataSource.initialize();
 		console.log("Datasource has been initialized");
-
-		const schema = await buildSchema({
-			resolvers: [OrganizationResolver]  // Make sure to include actual resolver classes
+		app.listen(port, () => {
+			console.log(`Backend server is listening on ${port}`);
+		}).on('error', (err) => {
+			console.log(err);
 		});
-
-		const server = new ApolloServer({schema});
-
-		const {url} = await startStandaloneServer(server, {
-			listen: {port: 4242}
-		});
-
-		console.log(`Server is ready at ${url}`);
 	} catch (err) {
-		console.error("Error during server setup: ", err);
+		console.error("Error during Datasource initialization", err);
 	}
 }
 

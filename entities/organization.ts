@@ -1,38 +1,29 @@
-import {Field, ID, InputType, ObjectType} from "type-graphql";
-import {BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Computer} from "./computer";
+import {User} from "./user";
+import {Device} from "./device"
 
 
-@ObjectType()
 @Entity({name: 'organization'})
 export class Organization extends BaseEntity {
-	@Field(() => ID)
 	@PrimaryGeneratedColumn()
-	id: number
+	id: string
 
-	@Field()
 	@Column({type: "character varying", nullable: false, length: 255})
 	name: string
 
-	@Field()
 	@Column({type: "character varying", nullable: true, length: 255})
 	type: string
 
-	@Field(() => [Computer])
-	@OneToMany(() => Computer, (ad) => ad.organization)
+	@OneToMany(() => Computer, (computer) => computer.organization)
 	computers: Computer[]
-	
-	@Field()
-	@CreateDateColumn({type: "timestamp with time zone"})
+
+	@OneToOne(() => User, (user) => user.organization)
+	user: User
+
+	@OneToMany(() => Device, (device) => device.organization)
+	devices: Device[]
+
+	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
 	created_at: Date
-}
-
-
-@InputType()
-export class NewOrganizationInput implements Partial<Organization> {
-	@Field()
-	name: string
-
-	@Field()
-	type: string
 }

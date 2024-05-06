@@ -1,12 +1,19 @@
-import express, {Express, Response, Request} from 'express'
-import cors from 'cors'
+import express from 'express'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import dotenv from 'dotenv'
+
+import 'reflect-metadata'
+
 import router from './router/index'
 
+dotenv.config({path: "/Users/martin/Documents/github_transferts/carz/.env"});
 
-const app: Express = express()
+
+const app = express()
 
 app.use(cors({
+	origin: 'http://localhost:3000',
 	credentials: true,
 	optionsSuccessStatus: 200
 }))
@@ -14,12 +21,15 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-app.get("/", (_req: Request, res: Response) => {
+app.get('/', (_req, res) => {
 	res.status(200).send("On / from server")
 })
 
 app.use("/api", router)
 
-app.get('*', (_req: Request, res: Response) => {
+app.get('*', (_req, res) => {
 	res.status(404).json({message: "Not found"})
 })
+
+export default app
+

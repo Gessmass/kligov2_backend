@@ -1,61 +1,39 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {Field, ID, InputType, ObjectType} from "type-graphql";
+import {BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Organization} from "./organization";
 import * as IpAddress from "ip-address"
 
-enum OsType {
-	Mac = "MacOs",
-	Linux = "Linux",
-	Windows = "Windows"
+enum OperatingSystem {
+	darwin = 'Mac',
+	win32 = 'Windows',
+	linux = 'Linux',
 }
 
-@ObjectType()
 @Entity({name: 'computer'})
 export class Computer extends BaseEntity {
-	@Field(() => ID)
 	@PrimaryGeneratedColumn()
-	id: number
+	id: string
 
-	@Field()
 	@Column({type: "character varying", nullable: false, length: 255})
 	name: string
 
-	@Field()
 	@Column({type: "inet", nullable: false})
 	ipv4: IpAddress.Address4
 
-	@Field()
 	@Column({type: "boolean", nullable: false, default: false})
 	is_master: boolean
 
-	@Field(() => OsType)
-	@Column({type: "enum", enum: OsType, nullable: false})
-	os: OsType
+	@Column({type: "enum", enum: OperatingSystem, nullable: false})
+	os: OperatingSystem
 
-	@Field(() => Organization)
+	@Column({type: "character varying", nullable: true, length: 10})
+	os_version: string
+
 	@ManyToOne(() => Organization, (organization) => organization.computers)
+	@JoinColumn({name: "organization_id"})
 	organization: Organization
 
-	@Field()
-	@CreateDateColumn({type: "timestamp with time zone"})
+	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
 	created_at: Date
 }
 
-@InputType()
-export class NewComputerInput {
-	@Field()
-	name: string;
-
-	@Field()
-	ipv4: string
-
-	@Field()
-	is_master: boolean;
-
-	@Field()
-	os: OsType;
-
-	@Field()
-	organizationId: number;
-}
 
