@@ -24,6 +24,11 @@ enum comProtocol {
 	lan = "lan"
 }
 
+enum macType {
+	public = 0,
+	private = 1
+}
+
 @Entity({name: "device"})
 export class Device extends BaseEntity {
 	@PrimaryGeneratedColumn()
@@ -40,6 +45,9 @@ export class Device extends BaseEntity {
 
 	@Column({type: "macaddr", nullable: false})
 	mac: string
+
+	@Column({type: "enum", enum: macType, nullable: false})
+	mac_type: macType
 
 	@Column({type: "enum", enum: deviceStatus, nullable: false})
 	status: deviceStatus
