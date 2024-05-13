@@ -44,7 +44,8 @@ export const login = async (req: Request, res: Response) => {
 		const formatErrors = validateLogin(req.body)
 
 		if (formatErrors) {
-			return res.status(401).send(formatErrors)
+			console.log(formatErrors)
+			return res.status(401).send("Input format error")
 		}
 
 		const user = await userService.findByEmail(req.body.email)
@@ -73,7 +74,8 @@ export const login = async (req: Request, res: Response) => {
 				firstname: user.firstname,
 				lastname: user.lastname,
 				email: user.email,
-			}
+			},
+			token
 		})
 
 	} catch (err) {
