@@ -12,19 +12,19 @@ import {Characteristic} from "./characteristic";
 import {Organization} from "./organization";
 import {UserHasDevice} from "./user_has_device";
 
-enum deviceStatus {
+export enum DeviceStatus {
 	active = "active",
 	removed = "removed",
 	locked = "locked",
 }
 
-enum comProtocol {
+export enum ComProtocol {
 	ble = "ble",
 	wifi = "wifi",
 	lan = "lan"
 }
 
-enum macType {
+export enum MacType {
 	public = 0,
 	private = 1
 }
@@ -46,14 +46,14 @@ export class Device extends BaseEntity {
 	@Column({type: "macaddr", nullable: false})
 	mac: string
 
-	@Column({type: "enum", enum: macType, nullable: false})
-	mac_type: macType
+	@Column({type: "enum", enum: MacType, nullable: false})
+	mac_type: MacType
 
-	@Column({type: "enum", enum: deviceStatus, nullable: false})
-	status: deviceStatus
+	@Column({type: "enum", enum: DeviceStatus, nullable: false})
+	status: DeviceStatus
 
-	@Column({type: "enum", enum: comProtocol, nullable: false})
-	protocol: comProtocol
+	@Column({type: "enum", enum: ComProtocol, nullable: false})
+	protocol: ComProtocol
 
 	@Column({type: "character varying", length: 6, nullable: false})
 	activation_code: string
