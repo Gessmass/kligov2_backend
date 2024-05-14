@@ -1,10 +1,9 @@
 import {Device} from "../entities/device";
 import dataSource from "../config/db";
-import {UserHasDevice} from "../entities/user_has_device";
 import {DeviceData} from "../controllers/deviceController";
+import {UserHasDevice} from "../entities/user_has_device";
 
 const deviceRepository = dataSource.getRepository(Device)
-
 
 const deviceService = {
 
@@ -19,22 +18,19 @@ const deviceService = {
 			throw new Error(`Error fetching all devices: ${err}`)
 		}
 	},
-
-	getAllFromUser: async (userId: string): Promise<Device[]> => {
-		try {
-			const devices = await dataSource.getRepository(UserHasDevice)
-				.createQueryBuilder('userHasDevice')
-				.leftJoinAndSelect("userHasDevice.device", "device")
-				.where("userHasDevice.user = :userId", {userId})
-				.getMany()
-
-			return devices.map(ud => ud.device)
-		} catch (err) {
-			throw new Error(`Error fetching all devices from user: ${err}`)
-		}
-	},
 	addOne: async (deviceData: DeviceData): Promise<Device | null> => {
-		const {name, customName, type, mac, status, protocol, activationCode, macType, organizationId} = deviceData
+		const {
+			name,
+			customName,
+			type,
+			mac,
+			model,
+			status,
+			protocol,
+			activationCode,
+			macType,
+			organizationId
+		} = deviceData
 
 		try {
 			const result = await deviceRepository
@@ -46,6 +42,7 @@ const deviceService = {
 					type,
 					status,
 					mac,
+					model,
 					protocol,
 					custom_name: customName,
 					activation_code: activationCode,
@@ -62,7 +59,28 @@ const deviceService = {
 		} catch (err) {
 			throw new Error(`Error creating new device : ${err}`)
 		}
-	}
+	},
+	getAllWithChars: async (userId: string): Promise<DeviceWithCharacteristics[]> => {
+		try {
+			// Start with the UserHasDevice repository if you're using TypeORM
+			const devices = await dataSource.getRepository(UserHasDevice)
+				.createQueryBuilder('userHasDevice')
+				.leftJoinAndSelect('userHasDevice.device', 'device')
+				.leftJoinAndSelect('device.characteristics', 'characteristics')
+				.where('userHasDevice.user_id = :userId', { userId })
+				.getMany();
+
+			// Extract devices with their characteristics
+			const result = devices.map(ud => ({
+				...ud.device,
+				characteristics: ud.device.characteristics
+			}));
+
+			return result;
+		} catch (err) {
+			throw new Error(`Error fetching user devices with their characteristics: ${err}`);
+		}
+	};
 }
 
 export default deviceService

@@ -3,6 +3,7 @@ import {validateLogin} from "../validators/loginValidator";
 import userService from "../services/userService";
 import {createToken} from "../helpers/jwtHelper";
 import {verifyPassword} from "../helpers/argonHelper";
+import deviceService from "../services/deviceService";
 
 
 export const login = async (req: Request, res: Response) => {
@@ -15,7 +16,6 @@ export const login = async (req: Request, res: Response) => {
 		}
 
 		const user = await userService.findByEmail(req.body.email)
-		console.log("User found by authController", user)
 
 		if (!user) {
 			return res.status(401).send("Invalid credentials")
@@ -30,18 +30,18 @@ export const login = async (req: Request, res: Response) => {
 		// @ts-ignore
 		delete user.password;
 
+		const userAuthDevices = await deviceService.getAllWithChars(user.id)
+
+		console.log("userInfos : ", user, userAuthDevices)
+
 		const token = createToken(user)
 
 		//TODO Passer secure à True en prod
 		res.cookie("auth_token", token, {httpOnly: true, secure: false})
 
 		res.status(200).json({
-			user: {
-				firstname: user.firstname,
-				lastname: user.lastname,
-				email: user.email,
-				organization: user.organization
-			},
+			...user,
+			...userAuthDevices,
 			token
 		})
 

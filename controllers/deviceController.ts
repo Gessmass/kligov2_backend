@@ -1,12 +1,13 @@
 import deviceService from "../services/deviceService";
-import {ComProtocol, Device, DeviceStatus, MacType} from "../entities/device";
+import {ComProtocol, Device, DeviceStatus, DeviceType, MacType} from "../entities/device";
 import {Request, Response} from "express";
 
 export type DeviceData = {
 	name: string,
 	customName: string,
-	type: string,
+	type: DeviceType,
 	mac: string,
+	model: string,
 	status: DeviceStatus,
 	protocol: ComProtocol,
 	activationCode: string,
@@ -24,22 +25,6 @@ export const getAllDevices = async (_req: Request, res: Response) => {
 	} catch (err) {
 		console.error(err);
 		return res.status(500).send("Internal Server Error");
-	}
-}
-
-export const getDevicesFromUser = async (req: Request, res: Response) => {
-	const userId = req.params.userId
-
-	try {
-		const data: Device[] = await deviceService.getAllFromUser(userId);
-		if (data && data.length > 0) {
-			return res.status(200).json(data);
-		} else {
-			return res.status(200).json({message: `No devices found for user ${userId}`, devices: []});
-		}
-	} catch (err) {
-		console.error(err);
-		res.status(500).json("Internal Server Error");
 	}
 }
 

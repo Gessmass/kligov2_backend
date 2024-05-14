@@ -29,6 +29,11 @@ export enum MacType {
 	private = 1
 }
 
+export enum DeviceType {
+	thermometer = "thermometer",
+	oxymeter = "oxymeter"
+}
+
 @Entity({name: "device"})
 export class Device extends BaseEntity {
 	@PrimaryGeneratedColumn()
@@ -40,8 +45,8 @@ export class Device extends BaseEntity {
 	@Column({type: "character varying", length: 65, nullable: true})
 	custom_name: string
 
-	@Column({type: "character varying", length: 65, nullable: false})
-	type: string
+	@Column({type: "enum", enum: DeviceType, nullable: false})
+	type: DeviceType
 
 	@Column({type: "macaddr", nullable: false})
 	mac: string
@@ -51,6 +56,9 @@ export class Device extends BaseEntity {
 
 	@Column({type: "enum", enum: DeviceStatus, nullable: false})
 	status: DeviceStatus
+
+	@Column({type: "character varying", length: 65, nullable: false})
+	model: string
 
 	@Column({type: "enum", enum: ComProtocol, nullable: false})
 	protocol: ComProtocol
