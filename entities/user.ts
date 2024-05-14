@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import {Organization} from "./organization";
 import {Address} from "./address";
-import {UserHasDevice} from "./user_has_device";
+import {UsersDevices} from "./users_devices";
 
 @Entity({name: 'user'})
 export class User extends BaseEntity {
@@ -36,8 +36,8 @@ export class User extends BaseEntity {
 	@JoinColumn({name: "organization_id"})
 	organization: Organization
 
-	@OneToMany(() => UserHasDevice, (userHasDevice) => userHasDevice.user)
-	userHasDevice: UserHasDevice[]
+	@OneToMany(() => UsersDevices, (usersDevices) => usersDevices.user)
+	devices: UsersDevices[]
 
 	@OneToMany(() => Address, (add) => add.user)
 	addresses: Address[]

@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
 
 		const userAuthDevices = await deviceService.getAllWithChars(user.id)
 
-		console.log("userInfos : ", user, userAuthDevices)
+		console.log("userAuthDevices", userAuthDevices)
 
 		const token = createToken(user)
 
@@ -40,8 +40,8 @@ export const login = async (req: Request, res: Response) => {
 		res.cookie("auth_token", token, {httpOnly: true, secure: false})
 
 		res.status(200).json({
-			...user,
-			...userAuthDevices,
+			user,
+			userAuthDevices,
 			token
 		})
 

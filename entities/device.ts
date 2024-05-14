@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import {Characteristic} from "./characteristic";
 import {Organization} from "./organization";
-import {UserHasDevice} from "./user_has_device";
+import {UsersDevices} from "./users_devices";
 
 export enum DeviceStatus {
 	active = "active",
@@ -66,8 +66,8 @@ export class Device extends BaseEntity {
 	@Column({type: "character varying", length: 6, nullable: false})
 	activation_code: string
 
-	@OneToMany(() => UserHasDevice, (userHasDevice) => userHasDevice.device)
-	userHasDevice: UserHasDevice[]
+	@OneToMany(() => UsersDevices, (usersDevices) => usersDevices.device)
+	users: UsersDevices[]
 
 	@OneToMany(() => Characteristic, (char) => char.device)
 	@JoinColumn({name: "characteristic_id"})

@@ -6,7 +6,7 @@ import {Computer} from "../entities/computer";
 import {Device} from "../entities/device";
 import {Log} from "../entities/log";
 import {User} from "../entities/user";
-import {UserHasDevice} from "../entities/user_has_device";
+import {UsersDevices} from "../entities/users_devices";
 
 export const dataSource = new DataSource({
 	type: "postgres",
@@ -17,7 +17,7 @@ export const dataSource = new DataSource({
 	database: "kligov2",
 	synchronize: false,
 	logging: ["error", "query"],
-	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UserHasDevice]
+	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UsersDevices]
 })
 
 export default dataSource

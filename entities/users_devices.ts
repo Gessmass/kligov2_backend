@@ -2,17 +2,17 @@ import {BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGene
 import {User} from "./user";
 import {Device} from "./device";
 
-@Entity()
-export class UserHasDevice extends BaseEntity {
+@Entity({name: 'users_devices'})
+export class UsersDevices extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string
 
-	@ManyToOne(() => User, (user) => user.userHasDevice)
-	@JoinColumn({name: 'user_id'}) // Ensure this matches your DB column name
+	@ManyToOne(() => User, (user) => user.devices)
+	@JoinColumn({name: 'user_id'})
 	user: User;
 
-	@ManyToOne(() => Device, (device) => device.userHasDevice)
-	@JoinColumn({name: 'device_id'}) // Ensure this matches your DB column name
+	@ManyToOne(() => Device, (device) => device.users)
+	@JoinColumn({name: 'device_id'})
 	device: Device;
 
 	@CreateDateColumn({type: "timestamp with time zone", default: () => "CURRENT_TIMESTAMP"})

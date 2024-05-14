@@ -1,7 +1,6 @@
 import {Device} from "../entities/device";
 import dataSource from "../config/db";
 import {DeviceData} from "../controllers/deviceController";
-import {UserHasDevice} from "../entities/user_has_device";
 
 const deviceRepository = dataSource.getRepository(Device)
 
@@ -60,27 +59,21 @@ const deviceService = {
 			throw new Error(`Error creating new device : ${err}`)
 		}
 	},
-	getAllWithChars: async (userId: string): Promise<DeviceWithCharacteristics[]> => {
+	getAllWithChars: async (userId: string): Promise<Device[]> => {
 		try {
-			// Start with the UserHasDevice repository if you're using TypeORM
-			const devices = await dataSource.getRepository(UserHasDevice)
-				.createQueryBuilder('userHasDevice')
-				.leftJoinAndSelect('userHasDevice.device', 'device')
+			const result = await deviceRepository
+				.createQueryBuilder('device')
+				.leftJoinAndSelect('device.users', 'users_devices')
 				.leftJoinAndSelect('device.characteristics', 'characteristics')
-				.where('userHasDevice.user_id = :userId', { userId })
+				.where('users_devices.user_id = :userId', {userId})
 				.getMany();
 
-			// Extract devices with their characteristics
-			const result = devices.map(ud => ({
-				...ud.device,
-				characteristics: ud.device.characteristics
-			}));
+			return result
 
-			return result;
 		} catch (err) {
 			throw new Error(`Error fetching user devices with their characteristics: ${err}`);
 		}
-	};
+	}
 }
 
 export default deviceService
