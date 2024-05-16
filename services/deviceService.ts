@@ -17,6 +17,7 @@ const deviceService = {
 			throw new Error(`Error fetching all devices: ${err}`)
 		}
 	},
+
 	addOne: async (deviceData: DeviceData): Promise<Device | null> => {
 		const {
 			name,
@@ -30,7 +31,6 @@ const deviceService = {
 			macType,
 			organizationId
 		} = deviceData
-
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder('device')
