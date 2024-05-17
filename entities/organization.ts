@@ -4,7 +4,7 @@ import {User} from "./user";
 import {Device} from "./device"
 
 
-@Entity({name: 'organization'})
+@Entity({name: 'organizations'})
 export class Organization extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string

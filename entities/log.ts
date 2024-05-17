@@ -3,7 +3,7 @@ import {User} from "./user";
 import {Computer} from "./computer";
 
 
-@Entity()
+@Entity({name: 'logs'})
 export class Log {
 	@PrimaryGeneratedColumn()
 	id: number;

@@ -8,7 +8,7 @@ enum OperatingSystem {
 	linux = 'Linux',
 }
 
-@Entity({name: 'computer'})
+@Entity({name: 'computers'})
 export class Computer extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string

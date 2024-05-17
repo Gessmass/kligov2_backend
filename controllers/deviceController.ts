@@ -1,10 +1,9 @@
 import deviceService from "../services/deviceService";
 import {ComProtocol, Device, DeviceStatus, DeviceType, MacType} from "../entities/device";
 import {Request, Response} from "express";
+import {UpdateResult} from "typeorm";
 
 export type DeviceData = {
-	name: string,
-	customName: string,
 	type: DeviceType,
 	mac: string,
 	model: string,
@@ -40,5 +39,36 @@ export const createOneDevice = async (req: Request, res: Response) => {
 	} catch (err) {
 		console.error(err);
 		res.status(500).json("Internal Server Error");
+	}
+}
+
+export const activateDevice = async (req: Request, res: Response) => {
+	const {deviceAddr, sentCode, customName} = req.body
+
+	try {
+		const device = await deviceService.getOneByMac(deviceAddr)
+
+		console.log("activateDevice", device)
+
+		if (!device) {
+			return res.status(400).send("No device found");
+		}
+
+		console.log(sentCode, device.activation_code)
+
+		if (parseInt(sentCode) === parseInt(device.activation_code)) {
+
+			const result: UpdateResult = await deviceService.updateAfterActivate(device.id, customName)
+			if (result.affected) {
+				return res.status(200).send("Device successfully activated")
+			}
+
+		} else {
+			return res.status(401).send("Invalid activation code")
+		}
+
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
 	}
 }

@@ -9,9 +9,9 @@ const userService = {
 	findByEmail: async (userEmail: string): Promise<User> => {
 		try {
 			const user = await userRepository
-				.createQueryBuilder('user')
-				.where('user.email = :userEmail', {userEmail})
-				.leftJoinAndSelect("user.organization", 'organization')
+				.createQueryBuilder('users')
+				.where('users.email = :userEmail', {userEmail})
+				.leftJoinAndSelect("users.organization", 'organization')
 				.getMany()
 			return user[0]
 		} catch (err) {
@@ -24,7 +24,7 @@ const userService = {
 
 		try {
 			const result = await userRepository
-				.createQueryBuilder('user')
+				.createQueryBuilder('users')
 				.insert()
 				.into(User)
 				.values({

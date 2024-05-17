@@ -1,7 +1,7 @@
 import {BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Device} from "./device";
 
-@Entity()
+@Entity({name: 'characteristics'})
 export class Characteristic extends BaseEntity {
 
 	@PrimaryGeneratedColumn()

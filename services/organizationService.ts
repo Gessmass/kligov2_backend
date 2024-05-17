@@ -5,7 +5,7 @@ const organizationService = {
 	getAll: async () => {
 		try {
 			const organizations = await dataSource.getRepository(Organization)
-				.createQueryBuilder('organization')
+				.createQueryBuilder('organizations')
 				.getMany()
 
 			return organizations

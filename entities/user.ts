@@ -12,7 +12,7 @@ import {Organization} from "./organization";
 import {Address} from "./address";
 import {UsersDevices} from "./users_devices";
 
-@Entity({name: 'user'})
+@Entity({name: 'users'})
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string

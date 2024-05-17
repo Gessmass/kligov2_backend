@@ -25,6 +25,11 @@ app.get('/', (_req, res) => {
 	res.status(200).send("On / from server")
 })
 
+app.get('/health-check', (_req, res) => {
+	res.sendStatus(200)
+	console.log("health-checked")
+})
+
 app.use("/api", router)
 
 app.get('*', (_req, res) => {

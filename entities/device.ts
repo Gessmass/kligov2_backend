@@ -34,7 +34,7 @@ export enum DeviceType {
 	oxymeter = "oxymeter"
 }
 
-@Entity({name: "device"})
+@Entity({name: "devices"})
 export class Device extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string
