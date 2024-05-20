@@ -21,14 +21,12 @@ const deviceService = {
 
 	addOne: async (deviceData: DeviceData): Promise<Device | null> => {
 		const {
-			type,
 			mac,
-			model,
 			status,
-			protocol,
 			activationCode,
 			macType,
-			organizationId
+			organizationId,
+			model
 		} = deviceData
 		try {
 			const result = await deviceRepository
@@ -36,14 +34,12 @@ const deviceService = {
 				.insert()
 				.into(Device)
 				.values({
-					type,
 					status,
 					mac,
-					model,
-					protocol,
 					activation_code: activationCode,
 					organization: {id: organizationId},
-					mac_type: macType
+					mac_type: macType,
+					model
 				})
 				.execute()
 

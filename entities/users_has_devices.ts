@@ -2,9 +2,9 @@ import {BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGene
 import {User} from "./user";
 import {Device} from "./device";
 
-@Entity({name: 'users_devices'})
-export class UsersDevices extends BaseEntity {
-	@PrimaryGeneratedColumn()
+@Entity({name: 'users_has_devices'})
+export class UsersHasDevices extends BaseEntity {
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@ManyToOne(() => User, (user) => user.devices)

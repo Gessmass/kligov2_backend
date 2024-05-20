@@ -9,12 +9,11 @@ import {
 	PrimaryGeneratedColumn
 } from "typeorm";
 import {Organization} from "./organization";
-import {Address} from "./address";
-import {UsersDevices} from "./users_devices";
+import {UsersHasDevices} from "./users_has_devices";
 
 @Entity({name: 'users'})
 export class User extends BaseEntity {
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@Column({type: "character varying", nullable: false, length: 255})
@@ -36,11 +35,8 @@ export class User extends BaseEntity {
 	@JoinColumn({name: "organization_id"})
 	organization: Organization
 
-	@OneToMany(() => UsersDevices, (usersDevices) => usersDevices.user)
-	devices: UsersDevices[]
-
-	@OneToMany(() => Address, (add) => add.user)
-	addresses: Address[]
+	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.user)
+	devices: UsersHasDevices[]
 
 	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
 	created_at: Date

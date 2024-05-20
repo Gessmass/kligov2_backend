@@ -5,7 +5,7 @@ import {Computer} from "./computer";
 
 @Entity({name: 'logs'})
 export class Log {
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: number;
 
 	@ManyToOne(() => User)

@@ -10,7 +10,8 @@ import {
 } from "typeorm";
 import {Characteristic} from "./characteristic";
 import {Organization} from "./organization";
-import {UsersDevices} from "./users_devices";
+import {Model} from "./model";
+import {UsersHasDevices} from "./users_has_devices";
 
 export enum DeviceStatus {
 	active = "active",
@@ -18,25 +19,14 @@ export enum DeviceStatus {
 	locked = "locked",
 }
 
-export enum ComProtocol {
-	ble = "ble",
-	wifi = "wifi",
-	lan = "lan"
-}
-
 export enum MacType {
 	public = 0,
 	private = 1
 }
 
-export enum DeviceType {
-	thermometer = "thermometer",
-	oxymeter = "oxymeter"
-}
-
 @Entity({name: "devices"})
 export class Device extends BaseEntity {
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@Column({type: "character varying", length: 65, nullable: true})
@@ -44,9 +34,6 @@ export class Device extends BaseEntity {
 
 	@Column({type: "character varying", length: 65, nullable: true})
 	custom_name: string
-
-	@Column({type: "enum", enum: DeviceType, nullable: false})
-	type: DeviceType
 
 	@Column({type: "macaddr", nullable: false})
 	mac: string
@@ -57,17 +44,11 @@ export class Device extends BaseEntity {
 	@Column({type: "enum", enum: DeviceStatus, nullable: false})
 	status: DeviceStatus
 
-	@Column({type: "character varying", length: 65, nullable: false})
-	model: string
-
-	@Column({type: "enum", enum: ComProtocol, nullable: false})
-	protocol: ComProtocol
-
 	@Column({type: "character varying", length: 6, nullable: false})
 	activation_code: string
 
-	@OneToMany(() => UsersDevices, (usersDevices) => usersDevices.device)
-	users: UsersDevices[]
+	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.device)
+	users: UsersHasDevices[]
 
 	@OneToMany(() => Characteristic, (char) => char.device)
 	@JoinColumn({name: "characteristic_id"})
@@ -76,6 +57,10 @@ export class Device extends BaseEntity {
 	@ManyToOne(() => Organization, (orga) => orga.devices)
 	@JoinColumn({name: "organization_id"})
 	organization: Organization
+
+	@ManyToOne(() => Model, (model) => model.devices)
+	@JoinColumn({name: "model_id"})
+	model: Model
 
 	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
 	created_at: Date

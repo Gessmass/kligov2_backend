@@ -10,7 +10,7 @@ enum OperatingSystem {
 
 @Entity({name: 'computers'})
 export class Computer extends BaseEntity {
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@Column({type: "character varying", nullable: false, length: 255})

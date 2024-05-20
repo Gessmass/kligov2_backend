@@ -1,17 +1,18 @@
 import deviceService from "../services/deviceService";
-import {ComProtocol, Device, DeviceStatus, DeviceType, MacType} from "../entities/device";
+import {Device, DeviceStatus, MacType} from "../entities/device";
 import {Request, Response} from "express";
 import {UpdateResult} from "typeorm";
+import modelService from "../services/modelService";
+import organizationService from "../services/organizationService";
+import {Model} from "../entities/model";
 
 export type DeviceData = {
-	type: DeviceType,
 	mac: string,
-	model: string,
+	model: Model,
 	status: DeviceStatus,
-	protocol: ComProtocol,
 	activationCode: string,
 	organizationId: string,
-	macType: MacType
+	macType: MacType,
 }
 export const getAllDevices = async (_req: Request, res: Response) => {
 	try {
@@ -67,6 +68,18 @@ export const activateDevice = async (req: Request, res: Response) => {
 			return res.status(401).send("Invalid activation code")
 		}
 
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const getCreateDeviceFormOptions = async (req: Request, res: Response) => {
+	try {
+		const models = await modelService.getAll()
+		const organizations = await organizationService.getAll()
+
+		res.status(200).json({models, organizations})
 	} catch (err) {
 		console.error(err)
 		res.status(500).send("Internal server error")

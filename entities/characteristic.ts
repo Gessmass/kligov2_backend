@@ -4,7 +4,7 @@ import {Device} from "./device";
 @Entity({name: 'characteristics'})
 export class Characteristic extends BaseEntity {
 
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@Column({type: "character varying", length: 65, nullable: false})

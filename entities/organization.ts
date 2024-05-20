@@ -1,12 +1,22 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinTable,
+	OneToMany,
+	OneToOne,
+	PrimaryGeneratedColumn
+} from "typeorm";
 import {Computer} from "./computer";
 import {User} from "./user";
 import {Device} from "./device"
+import {Address} from "./address";
 
 
 @Entity({name: 'organizations'})
 export class Organization extends BaseEntity {
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn("uuid")
 	id: string
 
 	@Column({type: "character varying", nullable: false, length: 255})
@@ -23,6 +33,10 @@ export class Organization extends BaseEntity {
 
 	@OneToMany(() => Device, (device) => device.organization)
 	devices: Device[]
+
+	@OneToOne(() => Address, address => address.organization)
+	@JoinTable()
+	address: Address
 
 	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
 	created_at: Date
