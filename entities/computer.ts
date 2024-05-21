@@ -11,31 +11,40 @@ import {
 import {Organization} from "./organization";
 import * as IpAddress from "ip-address"
 
-enum OperatingSystem {
-	darwin = 'Mac',
-	win32 = 'Windows',
-	linux = 'Linux',
-}
-
 @Entity({name: 'computers'})
 export class Computer extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string
 
-	@Column({type: "character varying", nullable: false, length: 255})
-	name: string
-
-	@Column({type: "inet", nullable: false})
-	ipv4: IpAddress.Address4
+	@Column({type: "inet", nullable: true})
+	ip: IpAddress.Address4 | IpAddress.Address6
 
 	@Column({type: "boolean", nullable: false, default: false})
 	is_master: boolean
 
-	@Column({type: "enum", enum: OperatingSystem, nullable: false})
-	os: OperatingSystem
+	@Column({type: "character varying", nullable: false, length: 255})
+	home_dir: string
 
-	@Column({type: "character varying", nullable: true, length: 10})
+	@Column({type: "character varying", nullable: false, length: 65})
+	hostname: string
+
+	@Column({type: "character varying", nullable: false, length: 10})
+	platform: string
+
+	@Column({type: "character varying", nullable: false, length: 10})
+	arch: string
+
+	@Column({type: "character varying", nullable: false, length: 10})
 	os_version: string
+
+	@Column({type: "character varying", nullable: false, array: true})
+	cpus: string[]
+
+	@Column({type: "integer", nullable: false})
+	parallelism: number
+
+	@Column({type: "numeric", nullable: false})
+	total_memory: number
 
 	@ManyToOne(() => Organization, (organization) => organization.computers)
 	@JoinColumn({name: "organization_id"})

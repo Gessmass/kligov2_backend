@@ -58,6 +58,7 @@ const deviceService = {
 				.createQueryBuilder('devices')
 				.leftJoinAndSelect('devices.users', 'users_devices')
 				.where('users_devices.user_id = :userId', {userId})
+				.andWhere('devices.status = :status', {status: "active"})
 				.getMany();
 
 			return result
@@ -108,7 +109,7 @@ const deviceService = {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder("device")
-				.where("device.status = locked")
+				.where("device.status = :status", {status: "locked"})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
 				.getMany()
 

@@ -20,7 +20,7 @@ export const dataSource = new DataSource({
 	username: "postgres",
 	password: "1997",
 	database: "kligov2",
-	synchronize: true,
+	synchronize: false,
 	logging: ["error", "query"],
 	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UsersHasDevices, Model, DeviceType, Brand, Measurement, ModelHasMeasurement]
 })
