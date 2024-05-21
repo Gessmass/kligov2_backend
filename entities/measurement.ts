@@ -3,27 +3,28 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
-	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn
-} from "typeorm";
-import {Model} from "./model";
+} from 'typeorm';
+import {ModelHasMeasurement} from "./model_has_measurement";
 
-@Entity({name: 'device_types'})
-export class DeviceType extends BaseEntity {
+@Entity({name: 'measurements'})
+export class Measurement extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
-	id: string
+	id: string;
 
 	@Column({type: "character varying", length: 65, nullable: false})
-	name: string
+	name: string;
 
 	@Column({type: "character varying", length: 65, nullable: false})
-	value: string
+	type: string;
 
-	@ManyToOne(() => Model, model => model.type)
-	@JoinColumn({name: 'model_id'})
-	models: Model[]
+	@Column({type: "character varying", length: 10, nullable: false})
+	unit: string;
+
+	@OneToMany(() => ModelHasMeasurement, mm => mm.measurement)
+	modelMeasurements: ModelHasMeasurement[];
 
 	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
 	updated_at: Date;

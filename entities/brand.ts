@@ -1,4 +1,12 @@
-import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
+} from "typeorm";
 import {Model} from "./model";
 
 @Entity({name: 'brands'})
@@ -12,6 +20,9 @@ export class Brand extends BaseEntity {
 	@OneToMany(() => Model, (model) => model.brand)
 	models: Model[]
 
-	@Column({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }

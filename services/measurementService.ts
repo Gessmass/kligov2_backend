@@ -1,5 +1,5 @@
 import dataSource from "../config/db";
-import {Measurement} from "../entities/measurements";
+import {Measurement} from "../entities/measurement";
 
 const measurementRepository = dataSource.getRepository(Measurement)
 

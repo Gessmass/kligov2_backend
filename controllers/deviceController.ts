@@ -1,7 +1,6 @@
 import deviceService from "../services/deviceService";
 import {Device, DeviceStatus, MacType} from "../entities/device";
 import {Request, Response} from "express";
-import {UpdateResult} from "typeorm";
 import modelService from "../services/modelService";
 import organizationService from "../services/organizationService";
 import {Model} from "../entities/model";
@@ -59,8 +58,9 @@ export const activateDevice = async (req: Request, res: Response) => {
 
 		if (parseInt(sentCode) === parseInt(device.activation_code)) {
 
-			const result: UpdateResult = await deviceService.updateAfterActivate(device.id, customName)
-			if (result.affected) {
+			const result: Device = await deviceService.updateAfterActivate(device.id, customName)
+
+			if (result) {
 				return res.status(200).send("Device successfully activated")
 			}
 
@@ -80,6 +80,17 @@ export const getCreateDeviceFormOptions = async (req: Request, res: Response) =>
 		const organizations = await organizationService.getAll()
 
 		res.status(200).json({models, organizations})
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const getLockedDevicesByOrga = async (req: Request, res: Response) => {
+	try {
+		const devices: Device[] = await deviceService.getLockedByOrga(req.params.orgaId)
+
+		res.status(200).json(devices)
 	} catch (err) {
 		console.error(err)
 		res.status(500).send("Internal server error")

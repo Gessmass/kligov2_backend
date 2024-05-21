@@ -1,53 +1,51 @@
 import dataSource from "../config/db";
 import {Model} from "../entities/model";
-import {ModelsHasMeasures} from "../entities/models_has_measures";
+import {Measurement} from "../entities/measurement";
+import {ModelHasMeasurement} from "../entities/model_has_measurement";
 
-const modelRepository = dataSource.getRepository(Model)
+const modelRepository = dataSource.getRepository(Model);
+const measurementRepository = dataSource.getRepository(Measurement);
 
 const modelService = {
-	getAll: async () => {
+	getAll: async (): Promise<Model[]> => {
 		try {
-			const results = await modelRepository
-				.createQueryBuilder('models')
-				.getMany()
-
-			return results
-		} catch (err) {
-			throw new Error(`Error fetching all models: ${err}`)
+			return await modelRepository.find();
+		} catch (err: any) {
+			throw new Error(`Error fetching all models: ${err.message}`);
 		}
 	},
 
-	addOne: async (modelData: Model) => {
-		const {name, type, brand, measurements, protocol} = modelData;
+	addOne: async (modelData: Omit<Model, 'id'> & { measurements: string[] }): Promise<Model> => {
+		const {name, protocol, brand, measurements} = modelData;
 
-		try {
-			const result = await modelRepository.save({
-				name,
-				protocol,
-				brand,
-				type
-			});
+		return await dataSource.transaction(async transactionalEntityManager => {
+			try {
+				const newModel = new Model();
+				newModel.name = name;
+				newModel.protocol = protocol;
+				newModel.brand = brand;
 
-			const modelId = result.id;
+				const savedModel = await transactionalEntityManager.save(newModel);
 
-			if (modelId && measurements && measurements.length > 0) {
+				if (measurements && measurements.length > 0) {
+					const measurementEntities = await measurementRepository.findByIds(measurements);
 
+					const modelMeasurements = measurementEntities.map(measurement => {
+						const modelMeasurement = new ModelHasMeasurement();
+						modelMeasurement.model = savedModel;
+						modelMeasurement.measurement = measurement; // Directly assign the measurement entity
+						return modelMeasurement;
+					});
 
-				await dataSource.getRepository(ModelsHasMeasures)
-					.createQueryBuilder()
-					.insert()
-					.into(ModelsHasMeasures)
-					.values({
-						model_id: modelId,
-						measurement_id: measurements
-					})
-					.execute();
+					await transactionalEntityManager.save(modelMeasurements);
+				}
+
+				return savedModel;
+			} catch (err: any) {
+				throw new Error(`Error creating new model: ${err.message}`);
 			}
-
-		} catch (err) {
-			throw new Error(`Error creating new model : ${err}`);
-		}
+		});
 	}
-}
+};
 
-export default modelService
+export default modelService;

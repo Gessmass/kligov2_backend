@@ -9,8 +9,9 @@ import {User} from "../entities/user";
 import {Model} from "../entities/model";
 import {DeviceType} from "../entities/device_types";
 import {Brand} from "../entities/brand";
-import {Measurement} from "../entities/measurements";
 import {UsersHasDevices} from "../entities/users_has_devices";
+import {Measurement} from "../entities/measurement";
+import {ModelHasMeasurement} from "../entities/model_has_measurement";
 
 export const dataSource = new DataSource({
 	type: "postgres",
@@ -19,9 +20,9 @@ export const dataSource = new DataSource({
 	username: "postgres",
 	password: "1997",
 	database: "kligov2",
-	synchronize: false,
+	synchronize: true,
 	logging: ["error", "query"],
-	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UsersHasDevices, Model, DeviceType, Brand, Measurement]
+	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UsersHasDevices, Model, DeviceType, Brand, Measurement, ModelHasMeasurement]
 })
 
 export default dataSource

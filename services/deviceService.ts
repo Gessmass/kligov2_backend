@@ -1,7 +1,6 @@
-import {Device} from "../entities/device";
+import {Device, DeviceStatus} from "../entities/device";
 import dataSource from "../config/db";
 import {DeviceData} from "../controllers/deviceController";
-import {UpdateResult} from "typeorm";
 
 const deviceRepository = dataSource.getRepository(Device)
 
@@ -52,6 +51,7 @@ const deviceService = {
 			throw new Error(`Error creating new device : ${err}`)
 		}
 	},
+
 	getAllWithChars: async (userId: string): Promise<Device[]> => {
 		try {
 			const result = await deviceRepository
@@ -80,20 +80,41 @@ const deviceService = {
 		}
 	},
 
-	updateAfterActivate: async (deviceId: string, customName: string | null): Promise<UpdateResult> => {
-		try {
-			const queryBuilder = deviceRepository.createQueryBuilder().update('devices').set({status: 'active'});
+	updateAfterActivate: async (deviceId: string, customName: string | null): Promise<Device> => {
+		return await dataSource.transaction(async transactionEntityManager => {
+			try {
+				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}})
 
-			if (customName) {
-				queryBuilder.set({custom_name: customName});
+				if (!device) {
+					throw new Error(`Device not found for id ${deviceId}`)
+				}
+
+				device.status = DeviceStatus.active
+
+				if (customName) {
+					device.custom_name = customName;
+				}
+
+				const ipdatedDevice = transactionEntityManager.save(device)
+
+				return ipdatedDevice
+			} catch (err) {
+				throw new Error(`Error updating device after activation: ${err}`);
 			}
+		})
+	},
 
-			queryBuilder.where('devices.id = :deviceId', {deviceId});
+	getLockedByOrga: async (orgaId: string): Promise<Device[]> => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder("device")
+				.where("device.status = locked")
+				.andWhere("device.organization_id = :orgaId", {orgaId})
+				.getMany()
 
-			const result = await queryBuilder.execute();
 			return result
 		} catch (err) {
-			throw new Error(`Error updating device after activation: ${err}`);
+			throw new Error(`Error fetching locked devices by orga: ${err}`);
 		}
 	}
 }

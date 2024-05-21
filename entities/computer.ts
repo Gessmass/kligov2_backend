@@ -1,4 +1,13 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
+} from "typeorm";
 import {Organization} from "./organization";
 import * as IpAddress from "ip-address"
 
@@ -32,7 +41,10 @@ export class Computer extends BaseEntity {
 	@JoinColumn({name: "organization_id"})
 	organization: Organization
 
-	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }
 

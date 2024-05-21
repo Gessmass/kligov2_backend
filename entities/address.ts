@@ -1,4 +1,12 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToOne,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
+} from "typeorm";
 import {Organization} from "./organization";
 
 @Entity({name: 'addresses'})
@@ -28,6 +36,9 @@ export class Address extends BaseEntity {
 	@OneToOne(() => Organization, orga => orga.address)
 	organization: Organization
 
-	@CreateDateColumn({type: "timestamp with time zone", default: () => "CURRENT_TIMESTAMP"})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: string
 }

@@ -6,7 +6,8 @@ import {
 	JoinTable,
 	OneToMany,
 	OneToOne,
-	PrimaryGeneratedColumn
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
 } from "typeorm";
 import {Computer} from "./computer";
 import {User} from "./user";
@@ -19,10 +20,10 @@ export class Organization extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string
 
-	@Column({type: "character varying", nullable: false, length: 255})
+	@Column({type: "character varying", nullable: false, length: 65})
 	name: string
 
-	@Column({type: "character varying", nullable: true, length: 255})
+	@Column({type: "character varying", nullable: true, length: 65})
 	type: string
 
 	@OneToMany(() => Computer, (computer) => computer.organization)
@@ -38,6 +39,9 @@ export class Organization extends BaseEntity {
 	@JoinTable()
 	address: Address
 
-	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }

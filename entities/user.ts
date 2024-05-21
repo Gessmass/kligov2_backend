@@ -6,7 +6,8 @@ import {
 	JoinColumn,
 	OneToMany,
 	OneToOne,
-	PrimaryGeneratedColumn
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
 } from "typeorm";
 import {Organization} from "./organization";
 import {UsersHasDevices} from "./users_has_devices";
@@ -28,8 +29,11 @@ export class User extends BaseEntity {
 	@Column({type: "character varying", nullable: false, length: 65})
 	email: string
 
-	@Column({type: "character varying", nullable: true, length: 255})
+	@Column({type: "character varying", nullable: false, length: 255})
 	password: string
+
+	@Column({type: "character varying", nullable: true, length: 255})
+	temp_password: string
 
 	@OneToOne(() => Organization, (orga) => orga.user)
 	@JoinColumn({name: "organization_id"})
@@ -38,6 +42,9 @@ export class User extends BaseEntity {
 	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.user)
 	devices: UsersHasDevices[]
 
-	@CreateDateColumn({type: "timestamp with time zone", default: () => 'CURRENT_TIMESTAMP'})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }

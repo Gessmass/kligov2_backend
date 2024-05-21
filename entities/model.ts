@@ -1,20 +1,20 @@
 import {
 	BaseEntity,
 	Column,
+	CreateDateColumn,
 	Entity,
 	JoinColumn,
-	JoinTable,
-	ManyToMany,
 	ManyToOne,
 	OneToMany,
-	PrimaryGeneratedColumn
-} from "typeorm";
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
+} from 'typeorm';
+import {ModelHasMeasurement} from "./model_has_measurement";
+import {DeviceType} from "./device_types";
 import {Brand} from "./brand";
 import {Device} from "./device";
-import {Measurement} from "./measurements";
-import {DeviceType} from "./device_types";
 
-export enum ComProtocol {
+enum ComProtocol {
 	ble = "ble",
 	wifi = "wifi",
 	lan = "lan"
@@ -23,38 +23,30 @@ export enum ComProtocol {
 @Entity({name: 'models'})
 export class Model extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
-	id: string
+	id: string;
 
 	@Column({type: 'character varying', length: 65, nullable: false})
-	name: string
+	name: string;
 
 	@Column({type: "enum", enum: ComProtocol, nullable: false})
-	protocol: ComProtocol
+	protocol: ComProtocol;
 
 	@ManyToOne(() => Brand, (brand) => brand.models)
 	@JoinColumn({name: "brand_id"})
-	brand: Brand
+	brand: Brand;
 
 	@OneToMany(() => Device, (device) => device.model)
-	devices: Device[]
+	devices: Device[];
 
-	@ManyToMany(() => Measurement, measurement => measurement.models)
-	@JoinTable({
-		name: "models_has_measurements",
-		joinColumn: {
-			name: "model_id",
-			referencedColumnName: "id"
-		},
-		inverseJoinColumn: {
-			name: "measurement_id",
-			referencedColumnName: "id"
-		}
-	})
-	measurements: Measurement[]
+	@OneToMany(() => ModelHasMeasurement, mm => mm.model)
+	modelMeasurements: ModelHasMeasurement[];
 
 	@OneToMany(() => DeviceType, type => type.models)
-	type: DeviceType
+	type: DeviceType[];
 
-	@Column({type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP'})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }

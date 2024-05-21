@@ -1,4 +1,12 @@
-import {BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+	BaseEntity,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn
+} from "typeorm";
 import {User} from "./user";
 import {Device} from "./device";
 
@@ -15,6 +23,9 @@ export class UsersHasDevices extends BaseEntity {
 	@JoinColumn({name: 'device_id'})
 	device: Device;
 
-	@CreateDateColumn({type: "timestamp with time zone", default: () => "CURRENT_TIMESTAMP"})
+	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
+	updated_at: Date;
+
+	@CreateDateColumn({type: "timestamp with time zone", name: "created_at", nullable: false})
 	created_at: Date
 }
