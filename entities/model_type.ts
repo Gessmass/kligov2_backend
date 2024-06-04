@@ -3,15 +3,14 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
-	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn
 } from "typeorm";
 import {Model} from "./model";
 
-@Entity({name: 'device_types'})
-export class DeviceType extends BaseEntity {
+@Entity({name: 'model_types'})
+export class ModelType extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string
 
@@ -21,8 +20,7 @@ export class DeviceType extends BaseEntity {
 	@Column({type: "character varying", length: 65, nullable: false})
 	value: string
 
-	@ManyToOne(() => Model, model => model.type)
-	@JoinColumn({name: 'model_id'})
+	@OneToMany(() => Model, model => model.type)
 	models: Model[]
 
 	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})

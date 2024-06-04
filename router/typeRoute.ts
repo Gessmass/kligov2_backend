@@ -1,8 +1,8 @@
 import express from "express";
-import {getAllDeviceTypes} from "../controllers/typeController";
+import {getAllModelsTypes} from "../controllers/typeController";
 
 const router = express.Router()
 
-router.use('/', getAllDeviceTypes)
+router.use('/', getAllModelsTypes)
 
 export default router

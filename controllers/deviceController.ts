@@ -1,9 +1,11 @@
 import deviceService from "../services/deviceService";
-import {Device, DeviceStatus, MacType} from "../entities/device";
+import {Device, DeviceStatus} from "../entities/device";
 import {Request, Response} from "express";
 import modelService from "../services/modelService";
 import organizationService from "../services/organizationService";
 import {Model} from "../entities/model";
+import macService from "../services/macService";
+import {Mac} from "../entities/mac";
 
 export type DeviceData = {
 	mac: string,
@@ -11,7 +13,6 @@ export type DeviceData = {
 	status: DeviceStatus,
 	activationCode: string,
 	organizationId: string,
-	macType: MacType,
 }
 export const getAllDevices = async (_req: Request, res: Response) => {
 	try {
@@ -43,29 +44,41 @@ export const createOneDevice = async (req: Request, res: Response) => {
 }
 
 export const activateDevice = async (req: Request, res: Response) => {
-	const {deviceAddr, sentCode, customName} = req.body
+	const {deviceAddr, sentCode, customName, organizationId} = req.body
+
+	console.log(req.body)
 
 	try {
-		const device = await deviceService.getOneByMac(deviceAddr)
+		const lockedMac: Mac | null = await macService.getOneLocked(deviceAddr.toLowerCase())
 
-		console.log("activateDevice", device)
+		console.log(lockedMac)
 
-		if (!device) {
-			return res.status(400).send("No device found");
+		if (!lockedMac) {
+			return res.status(400).send("Unknown device, please select another one");
 		}
 
-		console.log(sentCode, device.activation_code)
+		const availableDeviceSlotsByOrga: Device[] = await deviceService.getLockedByOrga(organizationId)
 
-		if (parseInt(sentCode) === parseInt(device.activation_code)) {
+		if (availableDeviceSlotsByOrga.length === 0) {
+			return res.status(400).send("No available slot found for your organization")
+		}
 
-			const result: Device = await deviceService.updateAfterActivate(device.id, customName)
+		const matchingDeviceByModel = availableDeviceSlotsByOrga.find(slot => slot.model.id === lockedMac.model.id)
+		console.log(matchingDeviceByModel)
 
-			if (result) {
+		if (!matchingDeviceByModel) {
+			return res.status(400).send("No slot available for this kind of device")
+		}
+
+		if (matchingDeviceByModel.activation_code.toString() === sentCode.toString()) {
+			const updatedDevice: Device = await deviceService.updateAfterActivate(matchingDeviceByModel.id, customName, lockedMac.id)
+			const updatedMac = await macService.updateAfterActivate(lockedMac.addr, updatedDevice.id)
+
+			if (updatedDevice && updatedMac) {
 				return res.status(200).send("Device successfully activated")
 			}
-
 		} else {
-			return res.status(401).send("Invalid activation code")
+			res.status(500).send("Invalid activation code")
 		}
 
 	} catch (err) {
@@ -91,6 +104,19 @@ export const getLockedDevicesByOrga = async (req: Request, res: Response) => {
 		const devices: Device[] = await deviceService.getLockedByOrga(req.params.orgaId)
 
 		res.status(200).json(devices)
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const getUnusedAndSharedByOrga = async (req: Request, res: Response) => {
+	try {
+		const lockedDevices: Device[] = await deviceService.getLockedByOrga(req.params.orgaId)
+
+		const sharedDevices: Device[] = await deviceService.getSharedDevices(req.params.orgaId)
+
+		return res.status(200).json(...lockedDevices, ...sharedDevices)
 	} catch (err) {
 		console.error(err)
 		res.status(500).send("Internal server error")

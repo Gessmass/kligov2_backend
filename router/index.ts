@@ -6,6 +6,7 @@ import organizationRoute from "./organizationRoute";
 import modelRoute from "./modelRoute";
 import typeRoute from './typeRoute';
 import computerRoute from "./computerRoute";
+import macRoute from "./macRoute";
 
 const router = express.Router()
 
@@ -17,5 +18,6 @@ router.use('/users', userRoute)
 router.use('/models', modelRoute)
 router.use('/types', typeRoute)
 router.use('/computers', computerRoute)
+router.use('/mac', macRoute)
 
 export default router

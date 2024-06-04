@@ -1,14 +1,14 @@
 import typeService from "../services/typeService";
 import {Request, Response} from "express";
 import brandService from "../services/brandService";
-import {DeviceType} from "../entities/device_types";
 import {Brand} from "../entities/brand";
 import measurementService from "../services/measurementService";
 import modelService from "../services/modelService";
+import {ModelType} from "../entities/model_type";
 
 export const getCreateModelFormData = async (_req: Request, res: Response) => {
 	try {
-		const types: DeviceType[] = await typeService.getAll()
+		const types: ModelType[] = await typeService.getAll()
 
 		const brands: Brand[] = await brandService.getAll()
 

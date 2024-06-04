@@ -1,13 +1,13 @@
 import dataSource from "../config/db";
-import {DeviceType} from "../entities/device_types";
+import {ModelType} from "../entities/model_type";
 
-const deviceTypesRepository = dataSource.getRepository(DeviceType)
+const modelTypesRepository = dataSource.getRepository(ModelType)
 
 const typeService = {
 
 	getAll: async () => {
 		try {
-			const types = await deviceTypesRepository
+			const types = await modelTypesRepository
 				.createQueryBuilder('types')
 				.getMany()
 

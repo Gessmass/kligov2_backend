@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import typeService from "../services/typeService";
 
-export const getAllDeviceTypes = async (req: Request, res: Response) => {
+export const getAllModelsTypes = async (req: Request, res: Response) => {
 	try {
 		const types = await typeService.getAll()
 

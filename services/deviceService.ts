@@ -1,6 +1,7 @@
 import {Device, DeviceStatus} from "../entities/device";
 import dataSource from "../config/db";
 import {DeviceData} from "../controllers/deviceController";
+import {Mac} from "../entities/mac";
 
 const deviceRepository = dataSource.getRepository(Device)
 
@@ -20,24 +21,19 @@ const deviceService = {
 
 	addOne: async (deviceData: DeviceData): Promise<Device | null> => {
 		const {
-			mac,
-			status,
 			activationCode,
-			macType,
 			organizationId,
 			model
 		} = deviceData
+
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder('devices')
 				.insert()
 				.into(Device)
 				.values({
-					status,
-					mac,
 					activation_code: activationCode,
 					organization: {id: organizationId},
-					mac_type: macType,
 					model
 				})
 				.execute()
@@ -57,6 +53,9 @@ const deviceService = {
 			const result = await deviceRepository
 				.createQueryBuilder('devices')
 				.leftJoinAndSelect('devices.users', 'users_devices')
+				.leftJoinAndSelect('devices.model', 'device_model')
+				.leftJoinAndSelect('device_model.type', 'device_type')
+				.leftJoinAndSelect('devices.mac', 'mac')
 				.where('users_devices.user_id = :userId', {userId})
 				.andWhere('devices.status = :status', {status: "active"})
 				.getMany();
@@ -81,24 +80,29 @@ const deviceService = {
 		}
 	},
 
-	updateAfterActivate: async (deviceId: string, customName: string | null): Promise<Device> => {
+	updateAfterActivate: async (deviceId: string, customName: string | null, macId: string): Promise<Device> => {
 		return await dataSource.transaction(async transactionEntityManager => {
 			try {
 				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}})
+				const mac = await transactionEntityManager.findOne(Mac, {where: {id: macId}});
 
 				if (!device) {
 					throw new Error(`Device not found for id ${deviceId}`)
 				}
+				if (!mac) {
+					throw new Error(`MAC not found for id ${macId}`);
+				}
 
 				device.status = DeviceStatus.active
+				device.mac = mac
 
 				if (customName) {
 					device.custom_name = customName;
 				}
 
-				const ipdatedDevice = transactionEntityManager.save(device)
+				const updatedDevice = transactionEntityManager.save(device)
 
-				return ipdatedDevice
+				return updatedDevice
 			} catch (err) {
 				throw new Error(`Error updating device after activation: ${err}`);
 			}
@@ -109,13 +113,29 @@ const deviceService = {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder("device")
-				.where("device.status = :status", {status: "locked"})
+				.leftJoinAndSelect('device.model', 'model')
+				.where("device.status = :status", {status: DeviceStatus.locked})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
 				.getMany()
 
 			return result
 		} catch (err) {
 			throw new Error(`Error fetching locked devices by orga: ${err}`);
+		}
+	},
+
+	getSharedDevices: async (orgaId: string): Promise<Device[]> => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder('device')
+				.leftJoinAndSelect('device.model', 'model')
+				.where("device.organization_id = :orgaId", {orgaId})
+				.andWhere('model.protocol = :protocol', {protocol: "network"})
+				.getMany()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching shared devices for orga: ${err}`)
 		}
 	}
 }

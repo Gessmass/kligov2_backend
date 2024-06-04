@@ -6,12 +6,14 @@ import {
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn
 } from "typeorm";
 import {Organization} from "./organization";
 import {Model} from "./model";
 import {UsersHasDevices} from "./users_has_devices";
+import {Mac} from "./mac";
 
 export enum DeviceStatus {
 	active = "active",
@@ -19,10 +21,6 @@ export enum DeviceStatus {
 	locked = "locked",
 }
 
-export enum MacType {
-	public = 0,
-	private = 1
-}
 
 @Entity({name: "devices"})
 export class Device extends BaseEntity {
@@ -30,18 +28,9 @@ export class Device extends BaseEntity {
 	id: string
 
 	@Column({type: "character varying", length: 65, nullable: true})
-	name: string
-
-	@Column({type: "character varying", length: 65, nullable: true})
 	custom_name: string
 
-	@Column({type: "macaddr", nullable: false})
-	mac: string
-
-	@Column({type: "enum", enum: MacType, nullable: false})
-	mac_type: MacType
-
-	@Column({type: "enum", enum: DeviceStatus, nullable: false})
+	@Column({type: "enum", enum: DeviceStatus, nullable: false, default: DeviceStatus.locked})
 	status: DeviceStatus
 
 	@Column({type: "character varying", length: 6, nullable: false})
@@ -49,6 +38,10 @@ export class Device extends BaseEntity {
 
 	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.device)
 	users: UsersHasDevices[]
+
+	@OneToOne(() => Mac, mac => mac.device)
+	@JoinColumn({name: 'mac_id'})
+	mac: Mac
 
 	@ManyToOne(() => Organization, (orga) => orga.devices)
 	@JoinColumn({name: "organization_id"})
