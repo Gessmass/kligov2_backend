@@ -11,6 +11,12 @@ import {
 import {Organization} from "./organization";
 import * as IpAddress from "ip-address"
 
+
+enum roleOptions {
+	slave = 'slave',
+	master = 'master'
+}
+
 @Entity({name: 'computers'})
 export class Computer extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
@@ -19,8 +25,8 @@ export class Computer extends BaseEntity {
 	@Column({type: "inet", nullable: true})
 	ip: IpAddress.Address4 | IpAddress.Address6
 
-	@Column({type: "boolean", nullable: false, default: false})
-	is_master: boolean
+	@Column({type: "enum", enum: roleOptions, nullable: false, default: roleOptions.slave})
+	role: roleOptions
 
 	@Column({type: "character varying", nullable: false, length: 255})
 	home_dir: string

@@ -1,8 +1,12 @@
 import express from "express";
-import {storeDataAtFirstLaunch as storeDataOnFirstLaunch} from "../controllers/computerController";
+import {createNewComputer, getComputerRole, updateComputerById} from "../controllers/computerController";
 
 const router = express.Router()
 
-router.post("/at-first-launch", storeDataOnFirstLaunch)
+router.get('/get-role/:computerId', getComputerRole)
+
+router.put('/update-by-id', updateComputerById)
+
+router.post("/create", createNewComputer)
 
 export default router

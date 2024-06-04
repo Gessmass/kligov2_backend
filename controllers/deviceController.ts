@@ -6,6 +6,7 @@ import organizationService from "../services/organizationService";
 import {Model} from "../entities/model";
 import macService from "../services/macService";
 import {Mac} from "../entities/mac";
+import usersHasDevicesService from "../services/usersHasDevicesService";
 
 export type DeviceData = {
 	mac: string,
@@ -44,7 +45,7 @@ export const createOneDevice = async (req: Request, res: Response) => {
 }
 
 export const activateDevice = async (req: Request, res: Response) => {
-	const {deviceAddr, sentCode, customName, organizationId} = req.body
+	const {deviceAddr, sentCode, customName, organizationId, userId} = req.body
 
 	console.log(req.body)
 
@@ -71,10 +72,12 @@ export const activateDevice = async (req: Request, res: Response) => {
 		}
 
 		if (matchingDeviceByModel.activation_code.toString() === sentCode.toString()) {
+
 			const updatedDevice: Device = await deviceService.updateAfterActivate(matchingDeviceByModel.id, customName, lockedMac.id)
 			const updatedMac = await macService.updateAfterActivate(lockedMac.addr, updatedDevice.id)
+			const createdDeviceOwningRelation: Boolean = await usersHasDevicesService.addOne(updatedDevice.id, userId)
 
-			if (updatedDevice && updatedMac) {
+			if (updatedDevice && updatedMac && createdDeviceOwningRelation) {
 				return res.status(200).send("Device successfully activated")
 			}
 		} else {

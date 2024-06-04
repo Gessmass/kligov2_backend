@@ -67,19 +67,6 @@ const deviceService = {
 		}
 	},
 
-	getOneByMac: async (macAddr: string): Promise<Device | null> => {
-		try {
-			const result = await deviceRepository
-				.createQueryBuilder('devices')
-				.where('devices.mac = :macAddr', {macAddr})
-				.getOne()
-
-			return result
-		} catch (err) {
-			throw new Error(`Error fetching activation device by mac: ${err}`);
-		}
-	},
-
 	updateAfterActivate: async (deviceId: string, customName: string | null, macId: string): Promise<Device> => {
 		return await dataSource.transaction(async transactionEntityManager => {
 			try {
