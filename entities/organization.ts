@@ -26,6 +26,9 @@ export class Organization extends BaseEntity {
 	@Column({type: "character varying", nullable: true, length: 65})
 	type: string
 
+	@Column({type: "boolean", nullable: false, default: false})
+	network_mode_activated: boolean
+
 	@OneToMany(() => Computer, (computer) => computer.organization)
 	computers: Computer[]
 

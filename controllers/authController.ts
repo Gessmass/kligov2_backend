@@ -36,8 +36,10 @@ export const login = async (req: Request, res: Response) => {
 
 		const token = createToken(user)
 
-		//TODO Passer secure à True en prod
-		res.cookie("auth_token", token, {httpOnly: true, secure: false})
+		const network_mode_activated = await
+
+			//TODO Passer secure à True en prod
+			res.cookie("auth_token", token, {httpOnly: true, secure: false})
 
 		res.status(200).json({
 			user,
