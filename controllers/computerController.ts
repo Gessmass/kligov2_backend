@@ -29,15 +29,3 @@ export const getComputerRole = async (req: Request, res: Response) => {
 		res.status(500).send("Internal server error")
 	}
 }
-
-export const updateComputerById = async (req: Request, res: Response) => {
-	const {computerId, computerData} = req.body
-	try {
-		const computer = await computerService.updateOneById(computerId, computerData)
-
-		return res.status(200).json(computer)
-	} catch (err) {
-		console.error(err)
-		res.status(500).send("Internal server error")
-	}
-}

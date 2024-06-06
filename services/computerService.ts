@@ -38,7 +38,7 @@ const computerService = {
 		}
 	},
 
-	updateOneById: async (computerId: string, computerData: any) => {
+	upsertOne: async (computerData: any, computerId: string) => {
 		const {
 			hostname,
 			platform,
@@ -49,26 +49,27 @@ const computerService = {
 			network,
 			homedir,
 			cpus
-		} = computerData
+		} = computerData;
 		try {
-			let computer = await computerRepository.findOne({where: {id: computerId}})
+			let computer = await computerRepository.findOne({where: {id: computerId}});
 
-			if (computer) {
-				computer.hostname = hostname;
-				computer.arch = arch;
-				computer.platform = platform;
-				computer.os_version = version;
-				computer.home_dir = homedir;
-				computer.parallelism = parallelism;
-				computer.total_memory = totalMemory;
-				computer.cpus = cpus;
-				computer.ip = network.en0[1].address;
-
-				return await computerRepository.save(computer)
+			if (!computer) {
+				computer = computerRepository.create({id: computerId});
 			}
 
+			computer.hostname = hostname;
+			computer.arch = arch;
+			computer.platform = platform;
+			computer.os_version = version;
+			computer.home_dir = homedir;
+			computer.parallelism = parallelism;
+			computer.total_memory = totalMemory;
+			computer.cpus = cpus;
+			computer.ip = network.en0[1].address;
+
+			return await computerRepository.save(computer);
 		} catch (err) {
-			throw new Error(`Error updating new computer ${computerId} : ${err}`)
+			throw new Error(`Error upserting computer ${computerId}: ${err}`);
 		}
 	},
 
