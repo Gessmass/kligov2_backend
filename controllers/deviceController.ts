@@ -44,6 +44,7 @@ export const createOneDevice = async (req: Request, res: Response) => {
 	}
 }
 
+//TODO Modifier cette fonction pour gérer l'activation d'un device network (dans ce cas, deviceAddr remplacé par deviceId pour comparer dans la BDD)
 export const activateDevice = async (req: Request, res: Response) => {
 	const {deviceAddr, sentCode, customName, organizationId, userId} = req.body
 
