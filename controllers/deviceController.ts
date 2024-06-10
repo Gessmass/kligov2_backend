@@ -44,8 +44,7 @@ export const createOneDevice = async (req: Request, res: Response) => {
 	}
 }
 
-//TODO Modifier cette fonction pour gérer l'activation d'un device network (dans ce cas, deviceAddr remplacé par deviceId pour comparer dans la BDD)
-export const activateDevice = async (req: Request, res: Response) => {
+export const activateBleDevice = async (req: Request, res: Response) => {
 	const {deviceAddr, sentCode, customName, organizationId, userId} = req.body
 
 	console.log(req.body)
@@ -82,11 +81,35 @@ export const activateDevice = async (req: Request, res: Response) => {
 				return res.status(200).send("Device successfully activated")
 			}
 		} else {
-			res.status(500).send("Invalid activation code")
+			res.status(423).send("Invalid activation code")
 		}
 
 	} catch (err) {
 		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const activateNetworkDevice = async (req: Request, res: Response) => {
+	try {
+		const {sentCode, customName, deviceId} = req.body
+
+		const matchingDevice = await deviceService.getOne(deviceId)
+
+		if (!matchingDevice) {
+			return res.status(500).send('Device not found in database')
+		}
+
+		if (matchingDevice.activation_code.toString() === sentCode.toString()) {
+			const updatedDevice = await deviceService.updateAfterActivate(deviceId, customName, null)
+
+			if (updatedDevice) {
+				return res.status(200).send('Device successfully activated')
+			}
+		} else {
+			res.status(423).send('Invalid activation code')
+		}
+	} catch (err) {
 		res.status(500).send("Internal server error")
 	}
 }
@@ -106,6 +129,17 @@ export const getCreateDeviceFormOptions = async (req: Request, res: Response) =>
 export const getLockedDevicesByOrga = async (req: Request, res: Response) => {
 	try {
 		const devices: Device[] = await deviceService.getLockedByOrga(req.params.orgaId)
+
+		res.status(200).json(devices)
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const getLockedNetworkDevicesByOrga = async (req: Request, res: Response) => {
+	try {
+		const devices: Device[] = await deviceService.getNetworkLockedByOrga(req.params.orgaId)
 
 		res.status(200).json(devices)
 	} catch (err) {

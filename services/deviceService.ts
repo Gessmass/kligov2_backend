@@ -19,6 +19,19 @@ const deviceService = {
 		}
 	},
 
+	getOne: async (deviceId: string): Promise<Device | null> => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder('device')
+				.where('device.id = :deviceId', {deviceId})
+				.getOne()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching one device by ID : ${err}`)
+		}
+	},
+
 	addOne: async (deviceData: DeviceData): Promise<Device | null> => {
 		const {
 			activationCode,
@@ -67,33 +80,34 @@ const deviceService = {
 		}
 	},
 
-	updateAfterActivate: async (deviceId: string, customName: string | null, macId: string): Promise<Device> => {
+	updateAfterActivate: async (deviceId: string, customName: string | null, macId: string | null): Promise<Device> => {
 		return await dataSource.transaction(async transactionEntityManager => {
 			try {
-				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}})
-				const mac = await transactionEntityManager.findOne(Mac, {where: {id: macId}});
-
+				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}});
 				if (!device) {
-					throw new Error(`Device not found for id ${deviceId}`)
-				}
-				if (!mac) {
-					throw new Error(`MAC not found for id ${macId}`);
+					throw new Error(`Device not found for id ${deviceId}`);
 				}
 
-				device.status = DeviceStatus.active
-				device.mac = mac
+				if (macId) {
+					const mac = await transactionEntityManager.findOne(Mac, {where: {id: macId}});
+					if (!mac) {
+						throw new Error(`MAC not found for id ${macId}`);
+					}
+					device.mac = mac;
+				}
+
+				device.status = DeviceStatus.active;
 
 				if (customName) {
 					device.custom_name = customName;
 				}
 
-				const updatedDevice = transactionEntityManager.save(device)
-
-				return updatedDevice
+				const updatedDevice = await transactionEntityManager.save(device);
+				return updatedDevice;
 			} catch (err) {
 				throw new Error(`Error updating device after activation: ${err}`);
 			}
-		})
+		});
 	},
 
 	getLockedByOrga: async (orgaId: string): Promise<Device[]> => {
@@ -102,6 +116,22 @@ const deviceService = {
 				.createQueryBuilder("device")
 				.leftJoinAndSelect('device.model', 'model')
 				.where("device.status = :status", {status: DeviceStatus.locked})
+				.andWhere("device.organization_id = :orgaId", {orgaId})
+				.getMany()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching locked devices by orga: ${err}`);
+		}
+	},
+
+	getNetworkLockedByOrga: async (orgaId: string): Promise<Device[]> => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder("device")
+				.leftJoinAndSelect('device.model', 'model')
+				.where("device.status = :status", {status: DeviceStatus.locked})
+				.andWhere("model.protocol = :protocol", {protocol: 'network'})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
 				.getMany()
 
