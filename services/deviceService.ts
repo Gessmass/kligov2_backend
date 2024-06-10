@@ -146,7 +146,9 @@ const deviceService = {
 			const result = await deviceRepository
 				.createQueryBuilder('device')
 				.leftJoinAndSelect('device.model', 'model')
+				.leftJoinAndSelect('model.type', 'type')
 				.where("device.organization_id = :orgaId", {orgaId})
+				.andWhere("device.status = :status", {status: DeviceStatus.active})
 				.andWhere('model.protocol = :protocol', {protocol: "network"})
 				.getMany()
 

@@ -15,8 +15,9 @@ const modelService = {
 		}
 	},
 
-	addOne: async (modelData: Omit<Model, 'id'> & { measurements: string[] }): Promise<Model> => {
-		const {name, protocol, brand, measurements} = modelData;
+	addOne: async (modelData: any): Promise<Model> => {
+		console.log(modelData)
+		const {name, protocol, brand, measurements, defaultName, type} = modelData;
 
 		return await dataSource.transaction(async transactionalEntityManager => {
 			try {
@@ -24,6 +25,8 @@ const modelService = {
 				newModel.name = name;
 				newModel.protocol = protocol;
 				newModel.brand = brand;
+				newModel.default_name = defaultName;
+				newModel.type = type;
 
 				const savedModel = await transactionalEntityManager.save(newModel);
 

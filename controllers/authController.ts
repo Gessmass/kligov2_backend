@@ -42,6 +42,9 @@ export const login = async (req: Request, res: Response) => {
 
 		const userAuthDevices = await deviceService.getAllWithChars(user.id)
 
+		const sharedDevices = await deviceService.getSharedDevices(user.organization.id)
+		console.log(sharedDevices)
+
 		const token = createToken(user)
 
 		//TODO Passer secure à True en prod
@@ -51,7 +54,8 @@ export const login = async (req: Request, res: Response) => {
 			user,
 			userAuthDevices,
 			token,
-			computer
+			computer,
+			sharedDevices
 		})
 
 	} catch (err) {
