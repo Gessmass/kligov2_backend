@@ -12,7 +12,7 @@ import {Organization} from "./organization";
 import * as IpAddress from "ip-address"
 
 
-enum roleOptions {
+export enum roleOptions {
 	slave = 'slave',
 	master = 'master'
 }

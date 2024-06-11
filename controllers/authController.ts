@@ -22,6 +22,8 @@ export const login = async (req: Request, res: Response) => {
 
 		const user = await userService.findByEmail(email)
 
+		console.log("useeeer", user)
+
 		if (!user) {
 			return res.status(401).send("Invalid credentials")
 		}
@@ -38,12 +40,9 @@ export const login = async (req: Request, res: Response) => {
 
 		const computer = await computerService.upsertOne(computerData, computerId)
 
-		console.log("UPDATEDcoMpuTer", computer)
-
 		const userAuthDevices = await deviceService.getAllWithChars(user.id)
 
 		const sharedDevices = await deviceService.getSharedDevices(user.organization.id)
-		console.log(sharedDevices)
 
 		const token = createToken(user)
 

@@ -6,14 +6,16 @@ const userRepository = dataSource.getRepository(User);
 
 const userService = {
 
-	findByEmail: async (userEmail: string): Promise<User> => {
+	findByEmail: async (userEmail: string): Promise<User | null> => {
 		try {
 			const user = await userRepository
 				.createQueryBuilder('users')
-				.where('users.email = :userEmail', {userEmail})
 				.leftJoinAndSelect("users.organization", 'organization')
-				.getMany()
-			return user[0]
+				.leftJoinAndSelect('organization.computers', 'computers', 'computers.role = :role', {role: 'master'}) // Include role filter in the join condition
+				.where('users.email = :userEmail', {userEmail})
+				.getOne();
+
+			return user
 		} catch (err) {
 			throw new Error(`No user registered with email ${err}`)
 		}
