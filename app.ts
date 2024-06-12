@@ -13,9 +13,9 @@ dotenv.config({path: "/Users/martin/Documents/github_transferts/carz/.env"});
 const app = express()
 
 app.use(cors({
-	origin: 'http://localhost:3000',
+	origin: '*',
 	credentials: true,
-	optionsSuccessStatus: 200
+	optionsSuccessStatus: 200,
 }))
 
 app.use(express.json())
