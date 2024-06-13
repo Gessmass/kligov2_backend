@@ -38,7 +38,7 @@ export const login = async (req: Request, res: Response) => {
 		// @ts-ignore
 		delete user.password;
 
-		const computer = await computerService.upsertOne(computerData, computerId)
+		const computer = await computerService.upsertOne(computerData, computerId, user.organization.id)
 
 		const userAuthDevices = await deviceService.getAllWithChars(user.id)
 

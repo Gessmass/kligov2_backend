@@ -46,6 +46,9 @@ export class Computer extends BaseEntity {
 	@Column({type: "character varying", nullable: false, array: true})
 	cpus: string[]
 
+	@Column({type: "character varying", nullable: false, length: 255})
+	composed_id: string
+
 	@Column({type: "integer", nullable: false})
 	parallelism: number
 

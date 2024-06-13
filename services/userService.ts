@@ -22,9 +22,14 @@ const userService = {
 	},
 
 	addOne: async (userData: UserData): Promise<User | null> => {
-		const {firstname, lastname, type, email, password, organizationId} = userData
+		const {firstname, lastname, type, email, password, organizationId} = userData;
 
 		try {
+			const existingUser = await userRepository.findOneBy({email});
+			if (existingUser) {
+				throw new Error('User with the provided email already exists.');
+			}
+
 			const result = await userRepository
 				.createQueryBuilder('users')
 				.insert()
@@ -45,7 +50,10 @@ const userService = {
 
 			return user
 		} catch (err) {
-			throw new Error(`Error creating new user : ${err}`)
+			if (err === '23505') {
+				throw new Error('A user with the same email already exists.');
+			}
+			throw new Error(`Error creating new user: ${err}`);
 		}
 	}
 }

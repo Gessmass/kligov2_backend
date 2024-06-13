@@ -9,7 +9,7 @@ export const validateUser = (user: UserData) => {
 		type: Joi.string().min(3).max(20).required(),
 		email: Joi.string().min(8).max(40).required(),
 		password: Joi.string().min(6).max(40).required(),
-		organizationId: Joi.string().min(10).max(65).required()
+		organizationId: Joi.string().min(10).max(65).required(),
 	}).required()
 		.min(1)
 		.validate(user, {abortEarly: false}).error
