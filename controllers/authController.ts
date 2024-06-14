@@ -1,17 +1,14 @@
 import {Request, Response} from "express";
 import {validateLogin} from "../validators/loginValidator";
 import userService from "../services/userService";
-import {createToken} from "../helpers/jwtHelper";
 import {verifyPassword} from "../helpers/argonHelper";
 import deviceService from "../services/deviceService";
 import computerService from "../services/computerService";
 
 
 export const login = async (req: Request, res: Response) => {
-	const {email, plainPassword, computerData, computerId} = req.body
-
-	console.log(req.body)
-
+	const {email, plainPassword, computerData} = req.body
+	
 	try {
 		const formatErrors = validateLogin(req.body)
 
@@ -21,8 +18,6 @@ export const login = async (req: Request, res: Response) => {
 		}
 
 		const user = await userService.findByEmail(email)
-
-		console.log("useeeer", user)
 
 		if (!user) {
 			return res.status(401).send("Invalid credentials")
@@ -38,28 +33,26 @@ export const login = async (req: Request, res: Response) => {
 		// @ts-ignore
 		delete user.password;
 
-		const computer = await computerService.upsertOne(computerData, computerId, user.organization.id)
+		const computer = await computerService.upsertOne(computerData, user.organization.id)
 
 		const userAuthDevices = await deviceService.getAllWithChars(user.id)
 
 		const sharedDevices = await deviceService.getSharedDevices(user.organization.id)
 
-		const token = createToken(user)
 
 		//TODO Passer secure à True en prod
-		res.cookie("auth_token", token, {httpOnly: true, secure: false})
+		res.cookie("auth_token", {httpOnly: true, secure: false})
 
 		res.status(200).json({
 			user,
 			userAuthDevices,
-			token,
 			computer,
 			sharedDevices
 		})
 
 	} catch (err) {
 		console.log(err)
-		res.sendStatus(500)
+		res.status(500).send(err)
 	}
 }
 

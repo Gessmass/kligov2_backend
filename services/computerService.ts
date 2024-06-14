@@ -40,7 +40,7 @@ const computerService = {
 	},
 
 
-	upsertOne: async (computerData: any, computerId: string | null, orgaId: string) => {
+	upsertOne: async (computerData: any, orgaId: string) => {
 		const {
 			hostname,
 			platform,
@@ -48,15 +48,16 @@ const computerService = {
 			version,
 			parallelism,
 			totalMemory,
-			network,
+			ip,
 			homedir,
 			cpus
 		} = computerData;
 
+		const computerComposedId = await getComposedIdentifier(computerData);
 		try {
-			const data: any = {
-				id: computerId,
-				composed_identifier: getComposedIdentifier(computerData),
+
+			const data = {
+				composed_id: computerComposedId,
 				hostname,
 				organization: orgaId,
 				arch,
@@ -66,18 +67,23 @@ const computerService = {
 				parallelism,
 				total_memory: totalMemory,
 				cpus,
-				ip: network.en0[1].address
+				ip
 			};
 
-			const upsertedComputer = await computerRepository.save(data);
+			let computer = await computerRepository.findOneBy({composed_id: computerComposedId});
 
-			// Optionally re-fetch the computer from the database to ensure you have the latest state
-			const freshComputer = await computerRepository.findOne({where: {id: upsertedComputer.id}});
+			if (!computer) {
+				computer = computerRepository.create(data);
+			} else {
+				Object.assign(computer, data);
+			}
 
-			console.log(freshComputer);
-			return freshComputer;
+			const upsertedComputer = await computerRepository.save(computer);
+
+			return upsertedComputer;
 		} catch (err) {
-			throw new Error(`Error upserting computer ${computerId}: ${err}`);
+			console.error(`Error upserting computer with composedID ${computerComposedId} : ${err}`);
+			throw new Error(`Error upserting computer: ${err}`);
 		}
 	},
 

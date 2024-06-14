@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export const getComposedIdentifier = (computerData: any) => {
+export const getComposedIdentifier = async (computerData: any) => {
 	const {hostname, platform, totalMemory, cpus, arch} = computerData
 
 	const rawIdentifier = `${hostname} - ${cpus} - ${totalMemory} - ${platform} - ${arch}`

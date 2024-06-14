@@ -57,7 +57,7 @@ export class Computer extends BaseEntity {
 
 	@ManyToOne(() => Organization, (organization) => organization.computers)
 	@JoinColumn({name: "organization_id"})
-	organization: Organization
+	organization: string
 
 	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
 	updated_at: Date;
