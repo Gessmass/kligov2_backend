@@ -34,13 +34,13 @@ export class Computer extends BaseEntity {
 	@Column({type: "character varying", nullable: false, length: 65})
 	hostname: string
 
-	@Column({type: "character varying", nullable: false, length: 10})
+	@Column({type: "character varying", nullable: false, length: 65})
 	platform: string
 
-	@Column({type: "character varying", nullable: false, length: 10})
+	@Column({type: "character varying", nullable: false, length: 65})
 	arch: string
 
-	@Column({type: "character varying", nullable: false, length: 10})
+	@Column({type: "character varying", nullable: false, length: 65})
 	os_version: string
 
 	@Column({type: "character varying", nullable: false, array: true})
