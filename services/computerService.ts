@@ -5,40 +5,6 @@ import {getComposedIdentifier} from "../helpers/idHelper";
 const computerRepository = dataSource.getRepository(Computer);
 
 const computerService = {
-	addOne: async (computerData: any): Promise<Computer | null> => {
-		const {
-			hostname,
-			platform,
-			arch,
-			version,
-			parallelism,
-			totalMemory,
-			network,
-			homedir,
-			cpus
-		} = computerData
-
-		try {
-			const newComputer = computerRepository.create({
-				arch,
-				platform,
-				hostname,
-				os_version: version,
-				home_dir: homedir,
-				parallelism,
-				total_memory: totalMemory,
-				cpus,
-				ip: network.en0[1].address
-			});
-
-			const createdComputer = await computerRepository.save(newComputer);
-
-			return createdComputer;
-		} catch (err) {
-			throw new Error(`Error creating new computer at first launch : ${err}`)
-		}
-	},
-
 
 	upsertOne: async (computerData: any, orgaId: string) => {
 		const {
@@ -67,7 +33,7 @@ const computerService = {
 				parallelism,
 				total_memory: totalMemory,
 				cpus,
-				ip
+				local_ip: ip
 			};
 
 			let computer = await computerRepository.findOneBy({composed_id: computerComposedId});

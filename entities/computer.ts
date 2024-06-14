@@ -23,7 +23,7 @@ export class Computer extends BaseEntity {
 	id: string
 
 	@Column({type: "inet", nullable: true})
-	ip: IpAddress.Address4 | IpAddress.Address6
+	local_ip: IpAddress.Address4 | IpAddress.Address6
 
 	@Column({type: "enum", enum: roleOptions, nullable: false, default: roleOptions.slave})
 	role: roleOptions
