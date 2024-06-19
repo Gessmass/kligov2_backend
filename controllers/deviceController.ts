@@ -7,6 +7,7 @@ import {Model} from "../entities/model";
 import macService from "../services/macService";
 import {Mac} from "../entities/mac";
 import usersHasDevicesService from "../services/usersHasDevicesService";
+import UsersHasDevicesService from "../services/usersHasDevicesService";
 
 export type DeviceData = {
 	mac: string,
@@ -75,9 +76,9 @@ export const activateBleDevice = async (req: Request, res: Response) => {
 
 			const updatedDevice: Device = await deviceService.updateAfterActivate(matchingDeviceByModel.id, customName, lockedMac.id)
 			const updatedMac = await macService.updateAfterActivate(lockedMac.addr, updatedDevice.id)
-			const createdDeviceOwningRelation: Boolean = await usersHasDevicesService.addOne(updatedDevice.id, userId)
+			const createdDeviceOwningRelationship: Boolean = await usersHasDevicesService.addOne(updatedDevice.id, userId)
 
-			if (updatedDevice && updatedMac && createdDeviceOwningRelation) {
+			if (updatedDevice && updatedMac && createdDeviceOwningRelationship) {
 				return res.status(200).send("Device successfully activated")
 			}
 		} else {
@@ -148,13 +149,68 @@ export const getLockedNetworkDevicesByOrga = async (req: Request, res: Response)
 	}
 }
 
-export const getUnusedAndSharedByOrga = async (req: Request, res: Response) => {
+export const getNetworkUnusedByOrga = async (req: Request, res: Response) => {
 	try {
 		const lockedDevices: Device[] = await deviceService.getLockedByOrga(req.params.orgaId)
 
-		const sharedDevices: Device[] = await deviceService.getSharedDevices(req.params.orgaId)
+		const networkDevices: Device[] = await deviceService.getNetworkDevicesByOrgaId(req.params.orgaId)
 
-		return res.status(200).json(...lockedDevices, ...sharedDevices)
+		return res.status(200).json(...lockedDevices, ...networkDevices)
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const lendBleDevice = async (req: Request, res: Response) => {
+	const {deviceId, userId, orgaId} = req.body
+	try {
+		const deletedRow = await UsersHasDevicesService.deleteOne(deviceId)
+
+		if (deletedRow) {
+			const userAuthDevices = await deviceService.getAllByUserIdWithChars(userId)
+			const networkDevices = await deviceService.getNetworkDevicesByOrgaId(orgaId)
+			const freeBleDevices = await deviceService.getFreeBleByOrga(orgaId)
+
+			return res.status(200).json({userAuthDevices, networkDevices, freeBleDevices})
+		} else {
+			res.status(500).send("Unable to update owning relationship")
+		}
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const refreshDevicesList = async (req: Request, res: Response) => {
+	const {userId, orgaId} = req.params
+	try {
+		const userAuthDevices = await deviceService.getAllByUserIdWithChars(userId)
+		const networkDevices = await deviceService.getNetworkDevicesByOrgaId(orgaId)
+		const freeBleDevices = await deviceService.getFreeBleByOrga(orgaId)
+
+		return res.status(200).json({userAuthDevices, networkDevices, freeBleDevices})
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
+
+export const setBleDeviceOwner = async (req: Request, res: Response) => {
+	const {userId, deviceId, orgaId} = req.body
+	try {
+		const createdDeviceOwningRelation: Boolean = await usersHasDevicesService.addOne(deviceId, userId)
+
+		if (createdDeviceOwningRelation) {
+			const userAuthDevices = await deviceService.getAllByUserIdWithChars(userId)
+			const networkDevices = await deviceService.getNetworkDevicesByOrgaId(orgaId)
+			const freeBleDevices = await deviceService.getFreeBleByOrga(orgaId)
+
+			return res.status(200).json({userAuthDevices, networkDevices, freeBleDevices})
+		} else {
+			res.status(500).send("Internal server error")
+		}
+
 	} catch (err) {
 		console.error(err)
 		res.status(500).send("Internal server error")

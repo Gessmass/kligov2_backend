@@ -15,7 +15,7 @@ import {Device} from "./device";
 import {Mac} from "./mac";
 import {ModelType} from "./model_type";
 
-enum ComProtocol {
+export enum ComProtocol {
 	ble = "ble",
 	network = "network"
 }

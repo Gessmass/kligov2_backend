@@ -8,7 +8,7 @@ import computerService from "../services/computerService";
 
 export const login = async (req: Request, res: Response) => {
 	const {email, plainPassword, computerData} = req.body
-	
+
 	try {
 		const formatErrors = validateLogin(req.body)
 
@@ -35,9 +35,11 @@ export const login = async (req: Request, res: Response) => {
 
 		const computer = await computerService.upsertOne(computerData, user.organization.id)
 
-		const userAuthDevices = await deviceService.getAllWithChars(user.id)
+		const userAuthDevices = await deviceService.getAllByUserIdWithChars(user.id)
 
-		const sharedDevices = await deviceService.getSharedDevices(user.organization.id)
+		const networkDevices = await deviceService.getNetworkDevicesByOrgaId(user.organization.id)
+
+		const freeBleDevices = await deviceService.getFreeBleByOrga(user.organization.id)
 
 
 		//TODO Passer secure à True en prod
@@ -47,7 +49,8 @@ export const login = async (req: Request, res: Response) => {
 			user,
 			userAuthDevices,
 			computer,
-			sharedDevices
+			networkDevices,
+			freeBleDevices
 		})
 
 	} catch (err) {

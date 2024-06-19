@@ -13,7 +13,6 @@ export type UserData = {
 }
 
 export const createOneUser = async (req: Request, res: Response) => {
-
 	try {
 		const errors = validateUser(req.body);
 		if (errors) {

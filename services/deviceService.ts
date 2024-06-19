@@ -2,6 +2,8 @@ import {Device, DeviceStatus} from "../entities/device";
 import dataSource from "../config/db";
 import {DeviceData} from "../controllers/deviceController";
 import {Mac} from "../entities/mac";
+import {UsersHasDevices} from "../entities/users_has_devices";
+import {ComProtocol} from "../entities/model";
 
 const deviceRepository = dataSource.getRepository(Device)
 
@@ -61,7 +63,7 @@ const deviceService = {
 		}
 	},
 
-	getAllWithChars: async (userId: string): Promise<Device[]> => {
+	getAllByUserIdWithChars: async (userId: string): Promise<Device[]> => {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder('devices')
@@ -141,7 +143,7 @@ const deviceService = {
 		}
 	},
 
-	getSharedDevices: async (orgaId: string): Promise<Device[]> => {
+	getNetworkDevicesByOrgaId: async (orgaId: string): Promise<Device[]> => {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder('device')
@@ -155,6 +157,23 @@ const deviceService = {
 			return result
 		} catch (err) {
 			throw new Error(`Error fetching shared devices for orga: ${err}`)
+		}
+	},
+	getFreeBleByOrga: async (orgaId: string) => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder('device')
+				.leftJoin(UsersHasDevices, 'uhd', 'device.id = uhd.device_id')
+				.leftJoinAndSelect('device.model', 'model')
+				.where('device.organization_id = :orgaId', {orgaId})
+				.andWhere('uhd.device_id IS NULL')
+				.andWhere('model.protocol = :protocol', {protocol: ComProtocol.ble})
+				.andWhere('device.status = :status', {status: DeviceStatus.active})
+				.getMany()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching free ble devices by orga: ${err}`)
 		}
 	}
 }

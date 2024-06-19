@@ -30,8 +30,20 @@ const usersHasDevicesService = {
 			} catch (err) {
 				throw new Error(`Error creating usersHasDevicesService relation after activation: ${err}`);
 			}
-
 		})
+	},
+	deleteOne: async (deviceId: string) => {
+		try {
+			const result = await usersHasDevicesServiceRepository.createQueryBuilder()
+				.delete()
+				.from(UsersHasDevices)
+				.where('device_id = :deviceId', {deviceId})
+				.execute()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error removing usersHasDevicesService relation : ${err}`);
+		}
 	}
 }
 
