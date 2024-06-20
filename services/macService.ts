@@ -47,6 +47,47 @@ const macService = {
 				throw new Error(`Error updating device after activation: ${err}`);
 			}
 		})
+	},
+
+	getAllLocked: async () => {
+		try {
+			const result = await macRepository
+				.createQueryBuilder('mac')
+				.andWhere('mac.is_activated = :status', {status: false})
+				.getMany()
+
+			return result
+		} catch (err) {
+			console.error(err)
+			throw new Error(`Error fetching all locked mac addresses : ${err}`);
+		}
+	},
+
+	addOne: async (macData: any) => {
+		const {macAddress, model, macType} = macData
+
+		try {
+			const result = await macRepository
+				.createQueryBuilder('mac')
+				.insert()
+				.into(Mac)
+				.values({
+					addr: macAddress,
+					type: macType,
+					model
+				})
+				.execute()
+
+			const newMacId = result.identifiers[0].id
+
+			const newMac = await macRepository.findOneBy({id: newMacId})
+
+			return newMac
+
+		} catch (err) {
+			console.error(err)
+			throw new Error(`Error creating one mac addresse : ${err}`);
+		}
 	}
 }
 export default macService

@@ -1,7 +1,10 @@
 import express from "express";
-import {createOneOrManyMacs} from "../controllers/macController";
+import {createMacAddress, getAllLockedAddresses} from "../controllers/macController";
 
 const router = express.Router()
 
-router.post('/create', createOneOrManyMacs)
+router.get('/get-all-locked', getAllLockedAddresses)
+
+router.post('/create', createMacAddress)
+
 export default router

@@ -18,6 +18,6 @@ router.use('/users', userRoute)
 router.use('/models', modelRoute)
 router.use('/types', typeRoute)
 router.use('/computers', computerRoute)
-router.use('/mac', macRoute)
+router.use('/macs', macRoute)
 
 export default router

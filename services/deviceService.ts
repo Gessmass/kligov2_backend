@@ -133,7 +133,23 @@ const deviceService = {
 				.createQueryBuilder("device")
 				.leftJoinAndSelect('device.model', 'model')
 				.where("device.status = :status", {status: DeviceStatus.locked})
-				.andWhere("model.protocol = :protocol", {protocol: 'network'})
+				.andWhere("model.protocol = :protocol", {protocol: ComProtocol.network})
+				.andWhere("device.organization_id = :orgaId", {orgaId})
+				.getMany()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching locked devices by orga: ${err}`);
+		}
+	},
+
+	getBleLockedByOrga: async (orgaId: string): Promise<Device[]> => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder("device")
+				.leftJoinAndSelect('device.model', 'model')
+				.where("device.status = :status", {status: DeviceStatus.locked})
+				.andWhere("model.protocol = :protocol", {protocol: ComProtocol.ble})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
 				.getMany()
 
