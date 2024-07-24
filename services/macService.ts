@@ -53,7 +53,8 @@ const macService = {
 		try {
 			const result = await macRepository
 				.createQueryBuilder('mac')
-				.andWhere('mac.is_activated = :status', {status: false})
+				.leftJoinAndSelect('mac.model', 'model')
+				.where('mac.is_activated = :status', {status: false})
 				.getMany()
 
 			return result

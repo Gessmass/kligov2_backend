@@ -7,10 +7,13 @@ import modelRoute from "./modelRoute";
 import typeRoute from './typeRoute';
 import computerRoute from "./computerRoute";
 import macRoute from "./macRoute";
+import {sendEmailToSupport} from "../email";
 
 const router = express.Router()
 
 router.use('/auth', authRoute)
+
+router.post('/contact', sendEmailToSupport)
 
 router.use('/organizations', organizationRoute)
 router.use('/devices', deviceRoute)

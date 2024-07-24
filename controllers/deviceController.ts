@@ -216,3 +216,12 @@ export const setBleDeviceOwner = async (req: Request, res: Response) => {
 		res.status(500).send("Internal server error")
 	}
 }
+
+export const getAllLockedDevicesByOrga = (req: Request, res: Response) => {
+	try {
+
+	} catch (err) {
+		console.error(err)
+		res.status(500).send("Internal server error")
+	}
+}
