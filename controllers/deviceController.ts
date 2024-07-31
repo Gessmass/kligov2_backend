@@ -97,9 +97,8 @@ export const refreshDevicesList = async (req: Request, res: Response) => {
 	try {
 		const userAuthDevices = await deviceService.getAllByUserIdWithChars(userId)
 		const networkDevices = await deviceService.getNetworkDevicesByOrgaId(orgaId)
-		const freeBleDevices = await deviceService.getFreeBleByOrga(orgaId)
 
-		return res.status(200).json({userAuthDevices, networkDevices, freeBleDevices})
+		return res.status(200).json({userAuthDevices, networkDevices})
 	} catch (err) {
 		console.error(err)
 		res.status(500).send("Internal server error")
@@ -197,11 +196,11 @@ export const renameDevice = async (req: Request, res: Response) => {
 	}
 }
 
-export const getUnusedBleDevices = async (req: Request, res: Response) => {
+export const getFreeBleDevices = async (req: Request, res: Response) => {
 	try {
 		const unusedBleDevices = await deviceService.getUnusedByOrga(req.params.orgaId)
 
-		if (unusedBleDevices && unusedBleDevices.length > 0) {
+		if (unusedBleDevices) {
 			return res.status(200).json(unusedBleDevices)
 		}
 	} catch (err) {

@@ -10,7 +10,6 @@ import {
 	UpdateDateColumn
 } from "typeorm";
 import {Organization} from "./organization";
-import {UsersHasDevices} from "./users_has_devices";
 import {Mac} from "./mac";
 
 @Entity({name: 'users'})
@@ -39,9 +38,6 @@ export class User extends BaseEntity {
 	@OneToOne(() => Organization, (orga) => orga.user)
 	@JoinColumn({name: "organization_id"})
 	organization: Organization
-
-	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.user)
-	devices: UsersHasDevices[]
 
 	@OneToMany(() => Mac, mac => mac.user)
 	macs: Mac[]

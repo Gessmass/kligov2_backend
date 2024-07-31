@@ -8,7 +8,6 @@ import {Log} from "../entities/log";
 import {User} from "../entities/user";
 import {Model} from "../entities/model";
 import {Brand} from "../entities/brand";
-import {UsersHasDevices} from "../entities/users_has_devices";
 import {Measurement} from "../entities/measurement";
 import {ModelHasMeasurement} from "../entities/model_has_measurement";
 import {Mac} from "../entities/mac";
@@ -23,7 +22,7 @@ export const dataSource = new DataSource({
 	database: "kligov2",
 	synchronize: false,
 	logging: ["error", "query"],
-	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, UsersHasDevices, Model, ModelType, Brand, Measurement, ModelHasMeasurement, Mac]
+	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, Model, ModelType, Brand, Measurement, ModelHasMeasurement, Mac]
 })
 
 export default dataSource

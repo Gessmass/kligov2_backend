@@ -39,8 +39,6 @@ export const login = async (req: Request, res: Response) => {
 
 		const networkDevices = await deviceService.getNetworkDevicesByOrgaId(user.organization.id)
 
-		const freeBleDevices = await deviceService.getFreeBleByOrga(user.organization.id)
-
 
 		//TODO Passer secure à True en prod
 		res.cookie("auth_token", {httpOnly: true, secure: false})
@@ -50,7 +48,6 @@ export const login = async (req: Request, res: Response) => {
 			userAuthDevices,
 			computer,
 			networkDevices,
-			freeBleDevices
 		})
 
 	} catch (err) {

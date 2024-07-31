@@ -4,10 +4,10 @@ import {
 	createOneDevice,
 	getAllDevices,
 	getCreateDeviceFormOptions,
+	getFreeBleDevices,
 	getLockedDevicesByOrga,
 	getLockedNetworkDevicesByOrga,
 	getNetworkUnusedByOrga,
-	getUnusedBleDevices,
 	lendBleDevice,
 	refreshDevicesList,
 	renameDevice,
@@ -22,7 +22,7 @@ router.get('/get-locked-by-orga/:orgaId', getLockedDevicesByOrga)
 router.get('/get-unused-and-shared-by-orga/:orgaId', getNetworkUnusedByOrga)
 router.get('/get-locked-network-devices-by-orga/:orgaId', getLockedNetworkDevicesByOrga)
 router.get('/refresh-auth-by-userid/:userId/:orgaId', refreshDevicesList)
-router.get('/get-unused-ble-by-orga/:orgaId', getUnusedBleDevices)
+router.get('/get-free-ble-by-orga/:orgaId', getFreeBleDevices)
 
 router.post('/create', createOneDevice)
 router.post('/set-ble-owner/', setBleDeviceOwner)

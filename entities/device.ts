@@ -5,14 +5,12 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn
 } from "typeorm";
 import {Organization} from "./organization";
 import {Model} from "./model";
-import {UsersHasDevices} from "./users_has_devices";
 import {Mac} from "./mac";
 
 export enum DeviceStatus {
@@ -35,9 +33,6 @@ export class Device extends BaseEntity {
 
 	@Column({type: "character varying", length: 6, nullable: false})
 	activation_code: string
-
-	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.device)
-	users: UsersHasDevices[]
 
 	@OneToOne(() => Mac, mac => mac.device)
 	@JoinColumn({name: 'mac_id'})
