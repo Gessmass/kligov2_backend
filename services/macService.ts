@@ -1,6 +1,8 @@
 import dataSource from "../config/db";
 import {Mac} from "../entities/mac";
-import {Device} from "../entities/device";
+import {Device, DeviceStatus} from "../entities/device";
+import {User} from "../entities/user";
+import {EntityManager, IsNull} from "typeorm";
 
 const macRepository = dataSource.getRepository(Mac)
 
@@ -22,11 +24,12 @@ const macService = {
 		}
 	},
 
-	updateAfterActivate: async (macAddr: string, deviceId: string) => {
-		return await dataSource.transaction(async transactionentityManager => {
+	updateAfterActivate: async (macAddr: string, deviceId: string, userId: string) => {
+		return await dataSource.transaction(async (transactionEntityManager: EntityManager) => {
 			try {
-				const mac = await transactionentityManager.findOne(Mac, {where: {addr: macAddr}})
-				const device = await transactionentityManager.findOne(Device, {where: {id: deviceId}})
+				const mac = await transactionEntityManager.findOne(Mac, {where: {addr: macAddr}})
+				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}})
+				const owner = await transactionEntityManager.findOne(User, {where: {id: userId}})
 
 				if (!device) {
 					throw new Error(`Device not found for id ${deviceId}`)
@@ -34,17 +37,53 @@ const macService = {
 				if (!mac) {
 					throw new Error(`MAC not found for address ${macAddr}`);
 				}
+				if (!owner) {
+					throw new Error(`User not found for address ${userId}`);
+				}
 
 
-				mac!.activated_on = new Date()
-				mac!.device = device
-				mac!.is_activated = true
+				mac.activated_on = new Date()
+				mac.device = device
+				mac.is_activated = true
+				mac.user = owner
 
-				const updatedMac = transactionentityManager.save(mac)
+				const updatedMac = transactionEntityManager.save(mac)
 
 				return updatedMac
 			} catch (err) {
 				throw new Error(`Error updating device after activation: ${err}`);
+			}
+		})
+	},
+
+	getAllLockedByDeviceSlot: async (orgaId: string) => {
+		return await dataSource.transaction(async transactionEntityManager => {
+			try {
+				const modelsIdsSlotOpenResult: any[] = await transactionEntityManager
+					.getRepository(Device)
+					.createQueryBuilder('device')
+					.leftJoinAndSelect('device.model', 'model')
+					.select(['model.id'])
+					.where('device.organization = :orgaId', {orgaId})
+					.andWhere('device.status = :deviceStatus', {deviceStatus: DeviceStatus.locked})
+					.groupBy('model.id')
+					.getRawMany()
+
+				const modelsIdsSlotOpen = modelsIdsSlotOpenResult.map(result => result.model_id)
+
+				const lockedMacsByModels: Mac[] = await transactionEntityManager
+					.getRepository(Mac)
+					.createQueryBuilder('mac')
+					.leftJoinAndSelect('mac.model', 'model')
+					.leftJoinAndSelect('model.brand', 'brand')
+					.leftJoinAndSelect('model.type', 'type')
+					.where('mac.model_id IN (:...ids)', {ids: modelsIdsSlotOpen})
+					.andWhere('mac.is_activated = :macStatus', {macStatus: false})
+					.getMany()
+
+				return lockedMacsByModels
+			} catch (err) {
+				throw new Error(`Error fetching macs by models and organization : ${err}`);
 			}
 		})
 	},
@@ -88,6 +127,58 @@ const macService = {
 		} catch (err) {
 			console.error(err)
 			throw new Error(`Error creating one mac addresse : ${err}`);
+		}
+	},
+
+	setOwner: async (deviceId: string, userId: string) => {
+		return await dataSource.transaction(async (transactionEntityManager: EntityManager) => {
+			try {
+				const owner = await transactionEntityManager.findOne(User, {where: {id: userId}});
+				if (!owner) {
+					throw new Error(`Cannot find owner for id ${userId}`);
+				}
+
+				const device = await transactionEntityManager.findOne(Device, {where: {id: deviceId}});
+				if (!device) {
+					throw new Error(`Cannot find device for id ${deviceId}`);
+				}
+
+				const mac = await transactionEntityManager.findOne(Mac, {
+					where: {
+						user: IsNull(),
+						device: {id: deviceId}
+					}
+				});
+				if (!mac) {
+					throw new Error(`Cannot find Mac address`);
+				}
+
+				mac.user = owner;
+
+				await transactionEntityManager.save(mac);
+
+				return true;
+			} catch (err) {
+				console.error(err);
+				throw new Error(`Error setting new owner for device ${deviceId}: ${err}`);
+			}
+		});
+	},
+
+	removeOwner: async (deviceId: string) => {
+		try {
+			const mac = await macRepository
+				.createQueryBuilder('mac')
+				.leftJoin('mac.device', 'device')
+				.update(Mac)
+				.set({user: null})
+				.where('device.id = :deviceId', {deviceId})
+				.execute()
+
+			return true
+		} catch (err) {
+			console.error(err);
+			throw new Error(`Error setting new owner for device ${deviceId}: ${err}`);
 		}
 	}
 }

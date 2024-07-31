@@ -67,11 +67,10 @@ const deviceService = {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder('devices')
-				.leftJoinAndSelect('devices.users', 'users_devices')
 				.leftJoinAndSelect('devices.model', 'device_model')
 				.leftJoinAndSelect('device_model.type', 'device_type')
 				.leftJoinAndSelect('devices.mac', 'mac')
-				.where('users_devices.user_id = :userId', {userId})
+				.where('mac.user_id = :userId', {userId})
 				.andWhere('devices.status = :status', {status: "active"})
 				.getMany();
 
@@ -131,7 +130,10 @@ const deviceService = {
 		try {
 			const result = await deviceRepository
 				.createQueryBuilder("device")
+				.select(['device.id', 'device.status'])
 				.leftJoinAndSelect('device.model', 'model')
+				.leftJoinAndSelect('model.brand', 'brand')
+				.leftJoinAndSelect('model.type', 'type')
 				.where("device.status = :status", {status: DeviceStatus.locked})
 				.andWhere("model.protocol = :protocol", {protocol: ComProtocol.network})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
@@ -148,6 +150,7 @@ const deviceService = {
 			const result = await deviceRepository
 				.createQueryBuilder("device")
 				.leftJoinAndSelect('device.model', 'model')
+				.leftJoinAndSelect('device.mac', "mac")
 				.where("device.status = :status", {status: DeviceStatus.locked})
 				.andWhere("model.protocol = :protocol", {protocol: ComProtocol.ble})
 				.andWhere("device.organization_id = :orgaId", {orgaId})
@@ -190,6 +193,36 @@ const deviceService = {
 			return result
 		} catch (err) {
 			throw new Error(`Error fetching free ble devices by orga: ${err}`)
+		}
+	},
+
+	rename: async (deviceId: string, name: string) => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder()
+				.update(Device)
+				.set({custom_name: name})
+				.where('id = :deviceId', {deviceId})
+				.execute()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error trying to rename device ${deviceId} : ${err}`)
+		}
+	},
+
+	getUnusedByOrga: async (orgaId: string) => {
+		try {
+			const result = await deviceRepository
+				.createQueryBuilder('device')
+				.leftJoinAndSelect('device.mac', 'mac')
+				.where('organization = :orgaId', {orgaId})
+				.andWhere('mac.user = :user', {user: null})
+				.getMany()
+
+			return result
+		} catch (err) {
+			throw new Error(`Error fetching unused BLE devices for organization ${orgaId} : ${err}`)
 		}
 	}
 }

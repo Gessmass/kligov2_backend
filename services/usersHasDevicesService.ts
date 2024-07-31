@@ -44,7 +44,19 @@ const usersHasDevicesService = {
 		} catch (err) {
 			throw new Error(`Error removing usersHasDevicesService relation : ${err}`);
 		}
-	}
+	},
+
+	// removeUserId: async (deviceId: string, userId: string) => {
+	// 	try {
+	// 		const result = await usersHasDevicesServiceRepository
+	// 			.createQueryBuilder()
+	// 			.update(UsersHasDevices)
+	// 			.set({user: null})
+	//
+	// 	} catch (err) {
+	// 		throw new Error(`Error removing usersHasDevicesService relation for user ${userId}: ${err}`);
+	// 	}
+	// }
 }
 
 export default usersHasDevicesService

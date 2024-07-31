@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import {Organization} from "./organization";
 import {UsersHasDevices} from "./users_has_devices";
+import {Mac} from "./mac";
 
 @Entity({name: 'users'})
 export class User extends BaseEntity {
@@ -41,6 +42,9 @@ export class User extends BaseEntity {
 
 	@OneToMany(() => UsersHasDevices, (usersDevices) => usersDevices.user)
 	devices: UsersHasDevices[]
+
+	@OneToMany(() => Mac, mac => mac.user)
+	macs: Mac[]
 
 	@UpdateDateColumn({type: "timestamp with time zone", name: "updated_at", nullable: false})
 	updated_at: Date;

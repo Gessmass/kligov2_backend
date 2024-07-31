@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import {Model} from "./model";
 import {Device} from "./device";
+import {User} from "./user";
 
 export enum MacType {
 	public = 0,
@@ -41,6 +42,10 @@ export class Mac extends BaseEntity {
 	@OneToOne(() => Device, device => device.mac)
 	@JoinColumn({name: 'device_id'})
 	device: Device | null
+
+	@ManyToOne(() => User, user => user.macs)
+	@JoinColumn({name: 'user_id'})
+	user: User | null
 
 	@CreateDateColumn({type: "timestamp with time zone"})
 	created_at: Date
