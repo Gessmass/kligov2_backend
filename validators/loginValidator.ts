@@ -6,7 +6,6 @@ export const validateLogin = (user: User) => {
 	const schema = Joi.object({
 		email: Joi.string().email().required(),
 		plainPassword: Joi.string().min(6).max(30).required(),
-		computerId: Joi.string(),
 		computerData: Joi.object().required()
 	});
 

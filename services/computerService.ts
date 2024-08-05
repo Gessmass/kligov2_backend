@@ -1,6 +1,6 @@
 import {Computer} from "../entities/computer";
 import dataSource from "../config/db";
-import {getComposedIdentifier} from "../helpers/idHelper";
+import {createComposedIdentifier} from "../helpers/idHelper";
 
 const computerRepository = dataSource.getRepository(Computer);
 
@@ -16,12 +16,13 @@ const computerService = {
 			totalMemory,
 			ip,
 			homedir,
-			cpus
+			cpus,
+			persistentMacAddresses
 		} = computerData;
 
-		const computerComposedId = await getComposedIdentifier(computerData);
-		try {
+		const computerComposedId = await createComposedIdentifier(persistentMacAddresses);
 
+		try {
 			const data = {
 				composed_id: computerComposedId,
 				hostname,

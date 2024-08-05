@@ -1,10 +1,23 @@
 import dataSource from "../config/db";
 import {User} from "../entities/user";
 import {UserData} from "../controllers/userController";
+import {JwtPayload} from "jsonwebtoken";
 
 const userRepository = dataSource.getRepository(User);
 
 const userService = {
+	findOneById: async (id: JwtPayload | string): Promise<User | null> => {
+		try {
+			const result = await userRepository
+				.createQueryBuilder('user')
+				.where('user.id = :id', {id})
+				.getOne()
+
+			return result
+		} catch (err) {
+			throw new Error(`No user registered with id ${id} : ${err}`)
+		}
+	},
 
 	findByEmail: async (userEmail: string): Promise<User | null> => {
 		try {

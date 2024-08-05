@@ -1,8 +1,6 @@
 import nodemailer from 'nodemailer'
 import {Request, Response} from "express";
-import dotenv from 'dotenv'
 
-dotenv.config();
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -14,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmailToSupport = async (req: Request, res: Response) => {
 	const {senderInfos, category, title, message} = req.body
-	
+
 	const mailOptions = {
 		from: process.env.EMAIL,
 		to: process.env.SUPPORT_EMAIL,

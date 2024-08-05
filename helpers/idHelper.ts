@@ -1,11 +1,7 @@
 import crypto from "crypto";
 
-export const getComposedIdentifier = async (computerData: any) => {
-	const {hostname, platform, cpus, arch, homedir} = computerData
-
-	const rawIdentifier = `${hostname} - ${cpus} - ${platform} - ${arch} - ${homedir}`
-
+export const createComposedIdentifier = async (persistentMacAddresses: any) => {
 	const hash = crypto.createHash('sha256')
-	hash.update(rawIdentifier)
+	hash.update(persistentMacAddresses)
 	return hash.digest('hex')
 }

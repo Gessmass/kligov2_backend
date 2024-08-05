@@ -12,14 +12,19 @@ import {Measurement} from "../entities/measurement";
 import {ModelHasMeasurement} from "../entities/model_has_measurement";
 import {Mac} from "../entities/mac";
 import {ModelType} from "../entities/model_type";
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const {DB_NAME, DB_PORT, DB_HOST, DB_USER, DB_PASSWORD} = process.env
 
 export const dataSource = new DataSource({
 	type: "postgres",
-	host: "localhost",
-	port: 5432,
-	username: "postgres",
-	password: "1997",
-	database: "kligov2",
+	host: DB_HOST!,
+	port: parseInt(DB_PORT!),
+	username: DB_USER!,
+	password: DB_PASSWORD!,
+	database: DB_NAME!,
 	synchronize: false,
 	logging: ["error", "query"],
 	entities: [Organization, Address, Characteristic, Computer, Device, Log, User, Model, ModelType, Brand, Measurement, ModelHasMeasurement, Mac]
